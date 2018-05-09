@@ -19,7 +19,7 @@
  */
 package org.sonar.plugins.redmine.reviews;
 
-import com.taskadapter.redmineapi.bean.Tracker;
+import com.taskadapter.redmineapi.bean.TrackerFactory;
 import org.sonar.api.CoreProperties;
 import org.sonar.api.ServerExtension;
 import org.sonar.api.config.Settings;
@@ -49,7 +49,7 @@ public class RedmineIssueFactory implements ServerExtension {
 
     rule = ruleFinder.findByKey(issue.ruleKey());
 
-    redmineIssue.setTracker(new Tracker(rSettings.getTrackerID(), null));
+    redmineIssue.setTracker(new TrackerFactory().create(rSettings.getTrackerID(), null));
     redmineIssue.setPriorityId(rSettings.getPriorityID());
     redmineIssue.setSubject(createIssueSubject(issue));
     redmineIssue.setDescription(createIssueDescription(issue, settings.getString(CoreProperties.SERVER_BASE_URL)));

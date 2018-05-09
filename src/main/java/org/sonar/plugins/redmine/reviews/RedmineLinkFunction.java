@@ -42,7 +42,7 @@ public class RedmineLinkFunction implements Function, ServerExtension {
   }
 
   @Override
-  public void execute(List<> context) {
+  public void execute(Context context) {
     try {
       RedmineSettings redmineSettings = new RedmineSettings(context.projectSettings());
 
@@ -54,7 +54,7 @@ public class RedmineLinkFunction implements Function, ServerExtension {
       context.setAttribute(RedmineConstants.ISSUE_ID, issue.getId().toString());
     } catch (RedmineException ex) {
       throw new IllegalStateException(i18n.message(Locale.getDefault(), RedmineConstants.LINKED_ISSUE_REMOTE_SERVER_ERROR, null) + ex.getMessage(),
-          ex);
+              ex);
     }
   }
 
@@ -68,4 +68,6 @@ public class RedmineLinkFunction implements Function, ServerExtension {
 
     return message.toString();
   }
+
+
 }

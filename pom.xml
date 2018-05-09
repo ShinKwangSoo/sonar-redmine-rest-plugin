@@ -29,6 +29,12 @@
             <groupId>com.taskadapter</groupId>
             <artifactId>redmine-java-api</artifactId>
             <version>2.5.0</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.google.collections</groupId>
@@ -41,7 +47,19 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.7</version>
         </dependency>
-
+        <!-- https://mvnrepository.com/artifact/com.sun.jersey/jersey-server -->
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>1.19</version>
+        </dependency>
+        <dependency>
+            <groupId>sonar-api</groupId>
+            <artifactId>sonar-api</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/sonar-api.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <build>
@@ -50,11 +68,12 @@
                 <groupId>org.sonarsource.sonar-packaging-maven-plugin</groupId>
                 <artifactId>sonar-packaging-maven-plugin</artifactId>
                 <version>1.17</version>
+
                 <extensions>true</extensions>
                 <configuration>
                     <!-- the entry-point class that extends org.sonar.api.SonarPlugin -->
-                    <pluginClass>com.mycompany.sonar.reference.ExamplePlugin</pluginClass>
-
+                    <pluginClass>org.sonar.plugins.redmine.RedminePlugin</pluginClass>
+                    <pluginDescription>test</pluginDescription>
                     <!-- advanced properties can be set here. See paragraph "Advanced Build Properties". -->
                 </configuration>
             </plugin>
@@ -62,8 +81,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
         </plugins>

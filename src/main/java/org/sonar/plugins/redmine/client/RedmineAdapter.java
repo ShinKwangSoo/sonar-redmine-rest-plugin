@@ -22,6 +22,7 @@ package org.sonar.plugins.redmine.client;
 import com.google.common.collect.Maps;
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineManager;
+import com.taskadapter.redmineapi.RedmineManagerFactory;
 import com.taskadapter.redmineapi.bean.*;
 import org.apache.commons.collections.ListUtils;
 import org.sonar.api.BatchExtension;
@@ -38,7 +39,7 @@ public class RedmineAdapter implements BatchExtension, ServerExtension {
 
   public void connectToHost(final String host, final String apiKey) throws RedmineException {
     try {
-      redmineMgr = new RedmineManager(host, apiKey);
+      redmineMgr = RedmineManagerFactory.createWithApiKey(host, apiKey);
     } catch (Exception e) {
       throw ExceptionUtil.wrapException(e);
     }
