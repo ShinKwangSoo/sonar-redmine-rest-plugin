@@ -19,7 +19,7 @@
  */
 package org.sonar.plugins.redmine;
 
-import org.sonar.api.internal.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList;
 import org.sonar.api.measures.Metric;
 import org.sonar.api.measures.Metrics;
 

@@ -19,10 +19,10 @@
  */
 package org.sonar.plugins.redmine;
 
+import com.google.common.collect.ImmutableList;
 import org.sonar.api.Properties;
 import org.sonar.api.Property;
 import org.sonar.api.SonarPlugin;
-import org.sonar.api.internal.google.common.collect.ImmutableList;
 import org.sonar.plugins.redmine.client.RedmineAdapter;
 import org.sonar.plugins.redmine.config.RedmineSettings;
 import org.sonar.plugins.redmine.exceptions.RedmineGeneralException;

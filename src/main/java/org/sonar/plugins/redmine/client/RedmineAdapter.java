@@ -35,7 +35,7 @@ import java.util.Map;
 
 public class RedmineAdapter implements BatchExtension, ServerExtension {
 
-  protected RedmineManager redmineMgr;
+  private RedmineManager redmineMgr;
 
   public void connectToHost(final String host, final String apiKey) throws RedmineException {
     try {

@@ -21,16 +21,16 @@ package org.sonar.plugins.redmine.reviews;
 
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.bean.Issue;
-import org.sonar.api.ServerExtension;
+import org.sonar.Action.Function.Function;
 import org.sonar.api.i18n.I18n;
-import org.sonar.api.issue.action.Function;
 import org.sonar.plugins.redmine.RedmineConstants;
 import org.sonar.plugins.redmine.client.RedmineAdapter;
 import org.sonar.plugins.redmine.config.RedmineSettings;
 
 import java.util.Locale;
 
-public class RedmineLinkFunction implements Function, ServerExtension {
+
+public class RedmineLinkFunction implements Function {
   private final RedmineAdapter redmineAdapter;
   private final RedmineIssueFactory issueFactory;
   private final I18n i18n;

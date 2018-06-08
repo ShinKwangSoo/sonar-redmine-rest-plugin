@@ -36,6 +36,6 @@ public class RedmineDevelopersWidget extends AbstractRubyTemplate implements Rub
 
   @Override
   protected String getTemplatePath() {
-    return "/org/sonar/redmine/redmine_developers_widget.html.erb";
+    return "/org/sonar/redmine/redmine_developer.html";
   }
 }

@@ -19,14 +19,13 @@
  */
 package org.sonar.plugins.redmine.reviews;
 
-import org.sonar.api.ServerExtension;
-import org.sonar.api.issue.action.Actions;
+import org.sonar.Action.Function.Actions;
 import org.sonar.api.issue.condition.HasIssuePropertyCondition;
 import org.sonar.api.issue.condition.IsUnResolved;
 import org.sonar.api.issue.condition.NotCondition;
 import org.sonar.plugins.redmine.RedmineConstants;
 
-public class RedmineWorkflowBuilder implements ServerExtension {
+public class RedmineWorkflowBuilder{
 
   private final RedmineLinkFunction linkFunction;
   private Actions actions;
