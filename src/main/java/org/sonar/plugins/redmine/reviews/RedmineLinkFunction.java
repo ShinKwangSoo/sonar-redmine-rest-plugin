@@ -21,7 +21,7 @@ package org.sonar.plugins.redmine.reviews;
 
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.bean.Issue;
-import org.sonar.Action.Function.Function;
+import org.sonar.plugins.redmine.Action.Function.Function;
 import org.sonar.api.i18n.I18n;
 import org.sonar.plugins.redmine.RedmineConstants;
 import org.sonar.plugins.redmine.client.RedmineAdapter;

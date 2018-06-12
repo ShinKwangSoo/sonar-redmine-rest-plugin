@@ -7,7 +7,7 @@
     <packaging>sonar-plugin</packaging>
     <version>0.3-snapshot</version>
 
-    <name>SonarQube Redmine Plugin-6.7 LTS TEST</name>
+    <name>Sonarqube-to-redmine-plugin</name>
     <description>TEST</description>
 
     <properties>
@@ -91,8 +91,7 @@
                 <version>1.18.0.372</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <pluginKey>example</pluginKey>
-                    <pluginClass>org.sonarsource.plugins.example.ExamplePlugin</pluginClass>
+                    <pluginClass>org.sonar.plugins.redmine.RedminePlugin</pluginClass>
                 </configuration>
             </plugin>
             <plugin>

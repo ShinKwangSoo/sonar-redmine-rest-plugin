@@ -25,15 +25,14 @@ import com.taskadapter.redmineapi.RedmineManager;
 import com.taskadapter.redmineapi.RedmineManagerFactory;
 import com.taskadapter.redmineapi.bean.*;
 import org.apache.commons.collections.ListUtils;
-import org.sonar.api.BatchExtension;
-import org.sonar.api.ServerExtension;
+import org.sonar.api.server.ServerSide;
 import org.sonar.plugins.redmine.exceptions.ExceptionUtil;
-
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RedmineAdapter implements BatchExtension, ServerExtension {
+public class RedmineAdapter implements ServerSide {
 
   private RedmineManager redmineMgr;
 
@@ -92,8 +91,11 @@ public class RedmineAdapter implements BatchExtension, ServerExtension {
     }
   }
 
-  public Issue createIssue(final String projectKey, final Issue issue) throws RedmineException {
+/*  public Issue createIssue(final String projectKey, final Issue issue) throws RedmineException {
     return redmineMgr.getIssueManager().createIssue(projectKey, issue);
+  }*/
+  public Issue createIssue(final Issue issue) throws RedmineException {
+    return redmineMgr.getIssueManager().createIssue(issue);
   }
 
   public List<Issue> collectProjectIssues(final String projectKey, final java.util.Date projectDate) throws RedmineException {
@@ -134,5 +136,10 @@ public class RedmineAdapter implements BatchExtension, ServerExtension {
       }
     }
     return issuesByPriority;
+  }
+
+  @Override
+  public Class<? extends Annotation> annotationType() {
+    return null;
   }
 }

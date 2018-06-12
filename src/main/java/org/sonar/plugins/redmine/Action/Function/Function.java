@@ -1,4 +1,4 @@
-package org.sonar.Action.Function;
+package org.sonar.plugins.redmine.Action.Function;
 
 import org.sonar.api.config.Settings;
 import org.sonar.api.issue.Issue;

@@ -19,50 +19,35 @@
  */
 package org.sonar.plugins.redmine;
 
-import com.google.common.collect.ImmutableList;
-import org.sonar.api.Properties;
-import org.sonar.api.Property;
-import org.sonar.api.SonarPlugin;
+import org.sonar.api.Plugin;
 import org.sonar.plugins.redmine.client.RedmineAdapter;
+import org.sonar.plugins.redmine.config.RedmineProjectSetting;
 import org.sonar.plugins.redmine.config.RedmineSettings;
-import org.sonar.plugins.redmine.exceptions.RedmineGeneralException;
-import org.sonar.plugins.redmine.exceptions.RedmineNotAuthorizedException;
-import org.sonar.plugins.redmine.exceptions.RedmineNotFoundException;
+import org.sonar.plugins.redmine.exceptions.*;
 import org.sonar.plugins.redmine.reviews.RedmineIssueFactory;
-import org.sonar.plugins.redmine.reviews.RedmineLinkFunction;
-import org.sonar.plugins.redmine.reviews.RedmineWorkflowBuilder;
-import org.sonar.plugins.redmine.ui.RedmineDevelopersWidget;
-import org.sonar.plugins.redmine.ui.RedmineSettingsPage;
-import org.sonar.plugins.redmine.ui.RedmineWidget;
 
-import java.util.List;
+public class RedminePlugin implements Plugin {
 
-@Properties({
-  @Property(
-    key = RedmineSettings.URL,
-    name = "Redmine URL",
-    description = "Example: http://demo.redmine.org/"),
-  @Property(
-    key = RedmineSettings.API_ACCESS_KEY,
-    name = "API Access Key",
-    description = "You can find your API key on your account page ( /my/account ) when logged in, on the right-hand pane of the default layout.",
-    type = org.sonar.api.PropertyType.PASSWORD)})
-public class RedminePlugin extends SonarPlugin {
+    @Override
+    public void define(Context context) {
 
-  public List getExtensions() {
-    return ImmutableList.of(
         // Definitions
-        RedmineMetrics.class,
+        context.addExtension(RedmineMetrics.class);
         // Batch
-        RedmineSensor.class, RedmineAdapter.class, RedmineSettings.class,
+        context.addExtensions(RedmineSensor.class, RedmineAdapter.class, RedmineSettings.class);
         // Server
-        RedmineIssueFactory.class,
+        context.addExtension(RedmineIssueFactory.class);
+
+        // tutorial on settings
+        context.addExtensions(RedmineConnectProperties.getProperties())
+                .addExtension(RedmineAdapter.class);
         // UI
-        RedmineWidget.class, RedmineDevelopersWidget.class, RedmineSettingsPage.class,
+        //RedmineWidget.class, RedmineDevelopersWidget.class, RedmineSettingsPage.class,
         // Reviews
-        RedmineLinkFunction.class, RedmineWorkflowBuilder.class,
+        //RedmineLinkFunction.class, RedmineWorkflowBuilder.class,
         // Exceptions
-        RedmineGeneralException.class, org.sonar.plugins.redmine.exceptions.RedmineAuthenticationException.class,
-        org.sonar.plugins.redmine.exceptions.RedmineTransportException.class, RedmineNotFoundException.class, RedmineNotAuthorizedException.class);
-  }
+        context.addExtension(RedmineProjectSetting.class);
+        context.addExtensions(RedmineGeneralException.class, RedmineAuthenticationException.class, RedmineTransportException.class, RedmineNotFoundException.class, RedmineNotAuthorizedException.class);
+
+    }
 }

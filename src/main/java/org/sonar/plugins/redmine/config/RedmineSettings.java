@@ -20,19 +20,33 @@
 package org.sonar.plugins.redmine.config;
 
 
-import org.apache.commons.lang3.StringUtils;
-import org.sonar.api.BatchExtension;
-import org.sonar.api.ServerExtension;
-import org.sonar.api.config.Settings;
+import org.sonar.api.config.PropertyDefinition;
+import java.util.List;
 
-public class RedmineSettings implements BatchExtension, ServerExtension {
-  public static final String URL = "sonar.redmine.url";
+import static java.util.Arrays.asList;
 
-  public static final String API_ACCESS_KEY = "sonar.redmine.api-access-key";
+public class RedmineSettings {
+
   public static final String PROJECT_KEY = "sonar.redmine.project-key";
   public static final String PRIORITY_ID = "sonar.redmine.priority-id";
   public static final String TRACKER_ID = "sonar.redmine.tracker-id";
+  private static final String ONLY_PROJECT_KEY = "sonar.redmine.project-key";
 
+  private RedmineSettings(){
+
+  }
+  public static List<PropertyDefinition> getProperties() {
+    return asList(
+            (PropertyDefinition.builder(PROJECT_KEY)
+                    .name("PROJECT_KEY")
+                    .description("Project KEY")
+                    .category(ONLY_PROJECT_KEY)
+                    .defaultValue("")
+                    .build()));
+  }
+}
+
+/*
   private Settings settings;
 
   public RedmineSettings(Settings settings) {
@@ -40,11 +54,11 @@ public class RedmineSettings implements BatchExtension, ServerExtension {
   }
 
   public String getHost() {
-    return settings.getString(URL);
+    return settings.getString(REDMINE_URL);
   }
 
   public String getApiAccessKey() {
-    return settings.getString(API_ACCESS_KEY);
+    return settings.getString(API_KEY);
   }
 
   public String getProjectKey() {
@@ -60,11 +74,11 @@ public class RedmineSettings implements BatchExtension, ServerExtension {
   }
 
   public void setHost(String host) {
-    settings.setProperty(URL, host);
+    settings.setProperty(REDMINE_URL, host);
   }
 
   public void setApiAccessKey(String apiAccessKey) {
-    settings.setProperty(API_ACCESS_KEY, apiAccessKey);
+    settings.setProperty(API_KEY, apiAccessKey);
   }
 
   public void setProjectKey(String projectKey) {
@@ -81,5 +95,5 @@ public class RedmineSettings implements BatchExtension, ServerExtension {
 
   public boolean missingMandatoryParameters() {
     return StringUtils.isEmpty(getHost()) || StringUtils.isEmpty(getProjectKey()) || StringUtils.isEmpty(getApiAccessKey());
-  }
-}
+  }*/
+

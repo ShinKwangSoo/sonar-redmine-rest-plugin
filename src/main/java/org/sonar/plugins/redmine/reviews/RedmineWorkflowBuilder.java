@@ -19,7 +19,7 @@
  */
 package org.sonar.plugins.redmine.reviews;
 
-import org.sonar.Action.Function.Actions;
+import org.sonar.plugins.redmine.Action.Function.Actions;
 import org.sonar.api.issue.condition.HasIssuePropertyCondition;
 import org.sonar.api.issue.condition.IsUnResolved;
 import org.sonar.api.issue.condition.NotCondition;

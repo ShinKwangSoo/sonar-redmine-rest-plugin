@@ -1,4 +1,4 @@
-package org.sonar.Action.Function;
+package org.sonar.plugins.redmine.Action.Function;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
