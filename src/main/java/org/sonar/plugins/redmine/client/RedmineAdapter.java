@@ -28,9 +28,7 @@ import org.apache.commons.collections.ListUtils;
 import org.sonar.api.server.ServerSide;
 import org.sonar.plugins.redmine.exceptions.ExceptionUtil;
 import java.lang.annotation.Annotation;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RedmineAdapter implements ServerSide {
 
@@ -56,6 +54,7 @@ public class RedmineAdapter implements ServerSide {
   public Project getProject(String projectKey) throws RedmineException {
     try {
       return redmineMgr.getProjectManager().getProjectByKey(projectKey);
+
     } catch (RedmineException e) {
       throw ExceptionUtil.wrapException(e);
     }
@@ -83,6 +82,15 @@ public class RedmineAdapter implements ServerSide {
     return isMemberOfProject;
   }
 
+  public List<Tracker> getProjectTracker() throws RedmineException {
+    try {
+      return redmineMgr.getIssueManager().getTrackers();
+    } catch (RedmineException e) {
+      throw ExceptionUtil.wrapException(e);
+    }
+  }
+
+
   public List<IssuePriority> getIssuePriorities() throws RedmineException {
     try {
       return redmineMgr.getIssueManager().getIssuePriorities();
@@ -98,7 +106,7 @@ public class RedmineAdapter implements ServerSide {
     return redmineMgr.getIssueManager().createIssue(issue);
   }
 
-  public List<Issue> collectProjectIssues(final String projectKey, final java.util.Date projectDate) throws RedmineException {
+  public List<Issue> collectProjectIssues(final String projectKey, final Optional<Date> projectDate) throws RedmineException {
     final String date = projectDate == null
         ? null
         : new java.text.SimpleDateFormat("yyyy-MM-dd").format(projectDate);
@@ -122,7 +130,7 @@ public class RedmineAdapter implements ServerSide {
     return issues;
   }
 
-  public Map<String, Integer> collectProjectIssuesByPriority(final String projectKey, final java.util.Date projectDate) throws RedmineException {
+  public Map<String, Integer> collectProjectIssuesByPriority(final String projectKey, final Optional<Date> projectDate) throws RedmineException {
 
     List<Issue> issues = collectProjectIssues(projectKey, projectDate);
     Map<String, Integer> issuesByPriority = Maps.newHashMap();

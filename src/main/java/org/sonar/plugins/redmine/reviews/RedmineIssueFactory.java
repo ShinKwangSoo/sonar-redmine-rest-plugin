@@ -21,24 +21,26 @@ package org.sonar.plugins.redmine.reviews;
 
 import com.taskadapter.redmineapi.bean.TrackerFactory;
 import org.sonar.api.CoreProperties;
-import org.sonar.api.ServerExtension;
-import org.sonar.api.config.Settings;
+import org.sonar.api.batch.rule.ActiveRules;
+import org.sonar.api.config.Configuration;
 import org.sonar.api.i18n.I18n;
 import org.sonar.api.issue.Issue;
 import org.sonar.api.rules.Rule;
-import org.sonar.api.rules.RuleFinder;
+import org.sonar.api.server.ServerSide;
 import org.sonar.plugins.redmine.RedmineConstants;
 import org.sonar.plugins.redmine.config.RedmineSettings;
 
 import java.util.Locale;
 
-public class RedmineIssueFactory implements ServerExtension {
+import static java.lang.Integer.parseInt;
+
+public abstract class RedmineIssueFactory implements ServerSide {
   private I18n i18n;
-  private Settings settings;
-  private RuleFinder ruleFinder;
+  private Configuration settings;
+  private ActiveRules ruleFinder;
   private Rule rule;
 
-  public RedmineIssueFactory(I18n i18n, Settings settings, RuleFinder ruleFinder) {
+  public RedmineIssueFactory(I18n i18n, Configuration settings, ActiveRules ruleFinder) {
     this.i18n = i18n;
     this.settings = settings;
     this.ruleFinder = ruleFinder;
@@ -47,12 +49,12 @@ public class RedmineIssueFactory implements ServerExtension {
   public com.taskadapter.redmineapi.bean.Issue createRedmineIssue(Issue issue, RedmineSettings rSettings) {
     com.taskadapter.redmineapi.bean.Issue redmineIssue = new com.taskadapter.redmineapi.bean.Issue();
 
-    rule = ruleFinder.findByKey(issue.ruleKey());
+    rule = (Rule) ruleFinder.find(issue.ruleKey());
 
-    redmineIssue.setTracker(new TrackerFactory().create(rSettings.getTrackerID(), null));
-    redmineIssue.setPriorityId(rSettings.getPriorityID());
+    redmineIssue.setTracker(new TrackerFactory().create(parseInt(rSettings.TRACKER_ID), null));
+    redmineIssue.setPriorityId(parseInt(rSettings.PRIORITY_ID));
     redmineIssue.setSubject(createIssueSubject(issue));
-    redmineIssue.setDescription(createIssueDescription(issue, settings.getString(CoreProperties.SERVER_BASE_URL)));
+    redmineIssue.setDescription(createIssueDescription(issue, settings.getStringArray(CoreProperties.SERVER_BASE_URL)));
 
     return redmineIssue;
   }
@@ -65,7 +67,7 @@ public class RedmineIssueFactory implements ServerExtension {
     }
   }
 
-  private String createIssueDescription(Issue issue, String baseUrl) {
+  private String createIssueDescription(Issue issue, String[] baseUrl) {
     StringBuilder sb = new StringBuilder();
     sb.append(baseUrl);
     sb.append("/issue/show/");

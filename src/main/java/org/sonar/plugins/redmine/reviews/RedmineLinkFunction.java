@@ -21,8 +21,8 @@ package org.sonar.plugins.redmine.reviews;
 
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.bean.Issue;
-import org.sonar.plugins.redmine.Action.Function.Function;
 import org.sonar.api.i18n.I18n;
+import org.sonar.plugins.redmine.Action.Function.Function;
 import org.sonar.plugins.redmine.RedmineConstants;
 import org.sonar.plugins.redmine.client.RedmineAdapter;
 import org.sonar.plugins.redmine.config.RedmineSettings;
@@ -43,12 +43,13 @@ public class RedmineLinkFunction implements Function {
 
   @Override
   public void execute(Context context) {
+
     try {
       RedmineSettings redmineSettings = new RedmineSettings(context.projectSettings());
 
       Issue issue = issueFactory.createRedmineIssue(context.issue(), redmineSettings);
-      redmineAdapter.connectToHost(redmineSettings.getHost(), redmineSettings.getApiAccessKey());
-      issue = redmineAdapter.createIssue(redmineSettings.getProjectKey(), issue);
+      redmineAdapter.connectToHost(redmineSettings.REDMINE_URL, redmineSettings.API_KEY);
+      issue = redmineAdapter.createIssue(issue);
 
       context.addComment(generateCommentText(issue, redmineSettings));
       context.setAttribute(RedmineConstants.ISSUE_ID, issue.getId().toString());
@@ -62,7 +63,9 @@ public class RedmineLinkFunction implements Function {
     StringBuilder message = new StringBuilder();
 
     message.append(i18n.message(Locale.getDefault(), RedmineConstants.LINKED_ISSUE_COMMENT, null));
-    message.append(redmineSettings.getHost());
+    message.append(redmineSettings.REDMINE_URL);
+    message.append("/project/");
+    message.append(redmineSettings.PROJECT_KEY);
     message.append("/issues/");
     message.append(issue.getId().toString());
 

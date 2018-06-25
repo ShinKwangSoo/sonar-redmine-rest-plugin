@@ -20,8 +20,7 @@ const output = path.join(__dirname, '../../target/classes/static');
 
 module.exports = {
   entry: {
-    'measures_history': ['./src/main/js/app-measures_history.js'],
-    'sanity_check': ['./src/main/js/app-sanity_check.js'],
+    'Sonar-Issue-List': ['./src/main/js/Sonar-Issue-List.js'],
   },
   output: {
     path: output,

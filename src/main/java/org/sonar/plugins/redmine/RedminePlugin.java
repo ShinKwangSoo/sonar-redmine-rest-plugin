@@ -21,10 +21,11 @@ package org.sonar.plugins.redmine;
 
 import org.sonar.api.Plugin;
 import org.sonar.plugins.redmine.client.RedmineAdapter;
-import org.sonar.plugins.redmine.config.RedmineProjectSetting;
 import org.sonar.plugins.redmine.config.RedmineSettings;
 import org.sonar.plugins.redmine.exceptions.*;
 import org.sonar.plugins.redmine.reviews.RedmineIssueFactory;
+import org.sonar.plugins.redmine.ui.SonarToRedmine;
+
 
 public class RedminePlugin implements Plugin {
 
@@ -34,19 +35,24 @@ public class RedminePlugin implements Plugin {
         // Definitions
         context.addExtension(RedmineMetrics.class);
         // Batch
-        context.addExtensions(RedmineSensor.class, RedmineAdapter.class, RedmineSettings.class);
+        context.addExtensions(RedmineSensor.class, RedmineAdapter.class);
         // Server
         context.addExtension(RedmineIssueFactory.class);
-
+        context.addExtension(CountDistributionBuilder.class);
         // tutorial on settings
-        context.addExtensions(RedmineConnectProperties.getProperties())
-                .addExtension(RedmineAdapter.class);
+        try {
+            context.addExtensions(RedmineSettings.getProperties())
+                    .addExtension(RedmineAdapter.class);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
         // UI
+        context.addExtension(SonarToRedmine.class);
         //RedmineWidget.class, RedmineDevelopersWidget.class, RedmineSettingsPage.class,
         // Reviews
         //RedmineLinkFunction.class, RedmineWorkflowBuilder.class,
         // Exceptions
-        context.addExtension(RedmineProjectSetting.class);
+        /*context.addExtension(RedmineProjectSetting.class);*/
         context.addExtensions(RedmineGeneralException.class, RedmineAuthenticationException.class, RedmineTransportException.class, RedmineNotFoundException.class, RedmineNotAuthorizedException.class);
 
     }

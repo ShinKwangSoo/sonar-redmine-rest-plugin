@@ -1,6 +1,6 @@
 package org.sonar.plugins.redmine.Action.Function;
 
-import org.sonar.api.config.Settings;
+import org.sonar.api.config.Configuration;
 import org.sonar.api.issue.Issue;
 
 import javax.annotation.Nullable;
@@ -11,7 +11,7 @@ public interface Function {
     interface Context {
         Issue issue();
 
-        Settings projectSettings();
+        Configuration projectSettings();
 
         Context setAttribute(String key, @Nullable String value);
 

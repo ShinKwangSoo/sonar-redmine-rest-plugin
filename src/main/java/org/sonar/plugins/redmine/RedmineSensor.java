@@ -23,11 +23,8 @@ import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.bean.Issue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonar.api.batch.SensorContext;
-import org.sonar.api.ce.posttask.PostProjectAnalysisTask.ProjectAnalysis;
-import org.sonar.api.measures.CountDistributionBuilder;
-import org.sonar.api.measures.Measure;
-import org.sonar.api.resources.Project;
+import org.sonar.api.batch.sensor.SensorContext;
+import org.sonar.api.ce.posttask.PostProjectAnalysisTask;
 import org.sonar.plugins.redmine.client.RedmineAdapter;
 import org.sonar.plugins.redmine.config.RedmineSettings;
 
@@ -39,23 +36,24 @@ public class RedmineSensor {
   private final RedmineSettings redmineSettings;
   private final RedmineAdapter redmineAdapter;
 
+
   public RedmineSensor(RedmineSettings redmineSettings, RedmineAdapter redmineAdapter) {
     this.redmineSettings = redmineSettings;
     this.redmineAdapter = redmineAdapter;
   }
-
+/*
   public boolean shouldExecuteOnProject(Project project) {
     if (redmineSettings.missingMandatoryParameters()) {
       LOG.info("Redmine issues sensor will not run as some parameters are missing.");
     }
     return project.isRoot() && !redmineSettings.missingMandatoryParameters();
-  }
+  }*/
 
-  public void analyse(SensorContext context, ProjectAnalysis pproject) {
+  public void analyse(SensorContext context, PostProjectAnalysisTask.ProjectAnalysis project) {
     try {
-      redmineAdapter.connectToHost(redmineSettings.getHost(), redmineSettings.getApiAccessKey());
-      List<Issue> issues = redmineAdapter.collectProjectIssues(redmineSettings.getProjectKey(), pproject.getDate());
-      double totalIssues = issues.size();
+      redmineAdapter.connectToHost(redmineSettings.REDMINE_URL, redmineSettings.API_KEY);
+      List<Issue> issues = redmineAdapter.collectProjectIssues(redmineSettings.PROJECT_KEY, project.getAnalysisDate());
+   /*   double totalIssues = issues.size();*/
 
       CountDistributionBuilder issuesByDeveloper = new CountDistributionBuilder(RedmineMetrics.ISSUES_BY_DEVELOPER);
       CountDistributionBuilder issuesByPriority = new CountDistributionBuilder(RedmineMetrics.ISSUES_BY_PRIORITY);
@@ -68,20 +66,20 @@ public class RedmineSensor {
       }
 
       String url = buildUrl();
-      saveMeasures(context, totalIssues, url, issuesByDeveloper, issuesByPriority, issuesByStatus);
+      /*saveMeasures(context, totalIssues, url, issuesByDeveloper, issuesByPriority, issuesByStatus);*/
     } catch (RedmineException ex) {
       LOG.error("Redmine issues sensor failed to get project issues.", ex);
     }
   }
 
   private String buildUrl() {
-    StringBuilder urlBuilder = new StringBuilder(redmineSettings.getHost());
+    StringBuilder urlBuilder = new StringBuilder(redmineSettings.REDMINE_URL);
     urlBuilder.append("/projects/");
-    urlBuilder.append(redmineSettings.getProjectKey());
+    urlBuilder.append(redmineSettings.PROJECT_KEY);
     return urlBuilder.toString();
   }
 
-  protected void saveMeasures(SensorContext context, double totalPrioritiesCount, String url,
+/*   protected void saveMeasures(SensorContext context, double totalPrioritiesCount, String url,
                               CountDistributionBuilder issuesByDeveloper, CountDistributionBuilder issuesByPriority, CountDistributionBuilder issuesByStatus) {
     Measure redmineIssues = new Measure(RedmineMetrics.ISSUES, totalPrioritiesCount);
     redmineIssues.setUrl(url);
@@ -89,7 +87,7 @@ public class RedmineSensor {
     context.saveMeasure(issuesByDeveloper.build().setValue(totalPrioritiesCount));
     context.saveMeasure(issuesByPriority.build().setValue(totalPrioritiesCount));
     context.saveMeasure(issuesByStatus.build().setValue(totalPrioritiesCount));
-  }
+  }*/
 
   @Override
   public String toString() {

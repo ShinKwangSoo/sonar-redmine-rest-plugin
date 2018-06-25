@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.sonar.plugins.redmine</groupId>
@@ -35,7 +36,6 @@
             <artifactId>commons-lang</artifactId>
             <version>2.6</version>
         </dependency>
-
         <!-- redmine rest api(Issue commit)-->
         <dependency>
             <groupId>com.taskadapter</groupId>
@@ -91,6 +91,7 @@
                 <version>1.18.0.372</version>
                 <extensions>true</extensions>
                 <configuration>
+                    <pluginKey>redmine</pluginKey>
                     <pluginClass>org.sonar.plugins.redmine.RedminePlugin</pluginClass>
                 </configuration>
             </plugin>
@@ -104,53 +105,53 @@
                 </configuration>
             </plugin>
             <!--    <plugin>
-                  &lt;!&ndash; UTF-8 bundles are not supported by Java, so they must be converted during build &ndash;&gt;
-                  <groupId>org.codehaus.mojo</groupId>
-                  <artifactId>native2ascii-maven-plugin</artifactId>
-                  <version>1.0-beta-1</version>
-                  <executions>
+                  &lt;!&ndash; UTF-8 bundles are not supported by Java, so they must be converted during build -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>native2ascii-maven-plugin</artifactId>
+                <version>1.0-beta-1</version>
+                <executions>
                     <execution>
-                      <goals>
-                        <goal>native2ascii</goal>
-                      </goals>
+                        <goals>
+                            <goal>native2ascii</goal>
+                        </goals>
                     </execution>
-                  </executions>
-                </plugin>
-                <plugin>
-                  <groupId>com.github.eirslett</groupId>
-                  <artifactId>frontend-maven-plugin</artifactId>
-                  <version>1.6</version>
-                  <executions>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
                     <execution>
-                      <phase>generate-resources</phase>
-                      <id>install node and yarn</id>
-                      <goals>
-                        <goal>install-node-and-yarn</goal>
-                      </goals>
-                      <configuration>
-                        <nodeVersion>v8.5.0</nodeVersion>
-                        <yarnVersion>v1.1.0</yarnVersion>
-                      </configuration>
-                    </execution>
-                    <execution>
-                      <id>yarn install</id>
-                      <goals>
-                        <goal>yarn</goal>
-                      </goals>
+                        <phase>generate-resources</phase>
+                        <id>install node and yarn</id>
+                        <goals>
+                            <goal>install-node-and-yarn</goal>
+                        </goals>
+                        <configuration>
+                            <nodeVersion>v8.5.0</nodeVersion>
+                            <yarnVersion>v1.1.0</yarnVersion>
+                        </configuration>
                     </execution>
                     <execution>
-                      <phase>generate-resources</phase>
-                      <id>yarn run script</id>
-                      <goals>
-                        <goal>yarn</goal>
-                      </goals>
-                      <configuration>
-                        <arguments>run build</arguments>
-                      </configuration>
+                        <id>yarn install</id>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
                     </execution>
-                  </executions>
-                </plugin>-->
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <id>yarn run script</id>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>run build</arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
-
 </project>

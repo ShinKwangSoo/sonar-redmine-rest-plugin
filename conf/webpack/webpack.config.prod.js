@@ -32,7 +32,7 @@ config.plugins = [
   new webpack.optimize.OccurrenceOrderPlugin(),
 
   // Try to dedupe duplicated modules, if any:
-  new webpack.optimize.DedupePlugin()
+    new webpack.optimize.DedupePlugin()
 ];
 
 if (!noUglify) {
