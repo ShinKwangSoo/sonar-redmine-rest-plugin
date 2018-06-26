@@ -5,7 +5,6 @@
     "autoprefixer": "6.2.2",
     "babel-core": "6.14.0",
     "babel-jest": "18.0.0",
-    "babel-jest": "18.0.0",
     "babel-loader": "6.2.5",
     "babel-preset-react-app": "0.2.1",
     "cross-env": "2.0.0",
@@ -78,5 +77,9 @@
       "<rootDir>/scripts",
       "<rootDir>/conf"
     ]
+  },
+  "dependencies": {
+    "rc-tooltip": "^3.7.2",
+    "reactstrap": "^6.1.0"
   }
 }

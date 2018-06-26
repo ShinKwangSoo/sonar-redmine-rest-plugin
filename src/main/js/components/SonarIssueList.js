@@ -38,24 +38,18 @@ export default class SonarIssueList extends React.PureComponent {
             <div className="page page-limited">
                 <table className="data zebra">
                     <thead><tr className="code-components-header">
-                        <th className="thin nowrap text-left code-components-cell">Version</th>
-
-                        <th className="thin nowrap text-center code-components-cell">Quality Gate</th>
-
-                        <th className="thin nowrap text-right code-components-cell">TEST</th>
-                        <th className="thin nowrap text-right code-components-cell">Reliability Rating</th>
-
-                        <th className="thin nowrap text-right code-components-cell">Vulnerabilities</th>
-                        <th className="thin nowrap text-right code-components-cell">Security Rating</th>
-
-                        <th className="thin nowrap text-right code-components-cell">Code Smells</th>
-                        <th className="thin nowrap text-right code-components-cell">Maintainability Rating</th>
+                        <th className="thin nowrap text-center code-components-cell">Severity</th>
+                        <th className="thin nowrap text-right code-components-cell">type</th>
+                        <th className="thin nowrap text-right code-components-cell">Component</th>
+                        <th className="thin nowrap text-right code-components-cell">Line</th>
+                        <th className="thin nowrap text-left code-components-cell">message</th>
+                        <th className="thin nowrap text-center">To Redmine</th>
                     </tr></thead>{
                     <tbody>
                     {this.state.data.map(
-                        (value,idx) =>
+                        (issues,idx) =>
                             <MeasuresHistory
-                                issue={value}
+                                issue={issues}
                                 key={idx}
                             />
                     )

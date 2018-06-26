@@ -7,34 +7,38 @@ import {getJSON} from 'sonar-request'; // see https://github.com/SonarSource/son
 
 export function findIssueAndToRedmine(project) {
     return getJSON('/api/issues/search', {
-        project: project.key
+        componentKey: project.key
     }).then(function (response) {
         var data = [];
-        var numberOfIssue=0;
+        var numberOfIssue = 0;
         const numberOfIssueList = response.issues.length;
+        console.log(response.issues.length);
         if (numberOfIssueList > 0) {
             for (let i = 0; i < numberOfIssueList; i++) {
-                for (let j = 0; j < response.issues.length; j++) {
-                    let result = {
-                        key: response.issues[j].key,
-                        rule: "",
-                        severity: "",
-                        component: "",
-                        line: "",
-                        message: "",
-                        type: ""
-                    };
-                    for (let k = 0; k < response.issues.length; k++) {
-                        result.component = response.issues[k].component.value;
-                        result.line = response.issues[k].line.value;
-                        result.message = response.issues[k].message.value;
-                        result.rule = response.issues[k].rule.value;
-                        result.severity = response.issues[k].severity.value;
-                        result.type = response.issues[k].type.key;
-                    }
-                    data[numberOfIssue]=result;
-                    numberOfIssue++;
-                }
+                let result = {
+                    key: response.issues[i].key,
+                    rule: "",
+                    severity: "",
+                    component: "",
+                    line: "",
+                    message: "",
+                    type: ""
+                };
+                result.component = response.issues[i].component;
+                result.line = response.issues[i].line;
+                result.message = response.issues[i].message;
+                result.rule = response.issues[i].rule;
+                result.severity = response.issues[i].severity;
+                result.type = response.issues[i].type;
+                console.log(result.component);
+                console.log(result.line);
+                console.log(result.message);
+                console.log(result.rule);
+                console.log(result.severity);
+                console.log(result.type);
+                console.log("--------------");
+                data[numberOfIssue] = result;
+                numberOfIssue++;
             }
         }
         return data;
