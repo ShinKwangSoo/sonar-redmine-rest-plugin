@@ -41,7 +41,7 @@ export default class SonarIssueList extends React.PureComponent {
                         <th className="thin nowrap text-center code-components-cell">Severity</th>
                         <th className="thin nowrap text-right code-components-cell">type</th>
                         <th className="thin nowrap text-right code-components-cell">Component</th>
-                        <th className="thin nowrap text-right code-components-cell">Line</th>
+                        <th className="thin nowrap text-left code-components-cell">Line</th>
                         <th className="thin nowrap text-left code-components-cell">message</th>
                         <th className="thin nowrap text-center">To Redmine</th>
                     </tr></thead>{

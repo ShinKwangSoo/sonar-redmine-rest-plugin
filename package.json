@@ -79,7 +79,6 @@
     ]
   },
   "dependencies": {
-    "rc-tooltip": "^3.7.2",
-    "reactstrap": "^6.1.0"
+    "react-tooltip": "^3.6.1"
   }
 }
