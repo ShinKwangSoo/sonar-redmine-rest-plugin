@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import ReactTooltip from 'react-tooltip'
-import {findIssueAndToRedmine} from "../api";
+import axios from 'axios';
 
 export default class MeasuresHistory extends React.PureComponent {
     constructor(props){
@@ -14,12 +14,28 @@ export default class MeasuresHistory extends React.PureComponent {
     }
 
     IssueToRedmine(){
-        return getJSON('/api/settings/values', {
-            keys: "sonar.redmine.hosturl,sonar.redmine.api-access-key"
-        }).then(function (redmine_access) {
-            return getJSON()
-
-        })
+        axios.get('/api/settings/values?keys=sonar.redmine.hosturl,sonar.redmine.api-access-key')
+            .then(function (sonarPredmine){
+                const sonarkeylength=sonarPredmine.settings.length;
+                for(let i=0; i< sonarkeylength; i++){
+                    if(sonarPredmine.settings.keys[i]==='sonar.redmine.hosturl'){
+                        var url=sonarPredmine.settings.keys[i].value;
+                    }
+                    else{
+                        var acc=sonarPredmine.settings.keys[i].value;
+                    }
+                }
+                axios({
+                    method:'get',
+                    url: url+'/issues.json',
+                    headers:{
+                        'X-Redmine-API-KEY': acc,
+                        'Context-Type': 'application/json'
+                    }
+                }).then(function(result){
+                   console.log(result)
+                });
+            });
     }
 
     simplification = (line, maxLength) => {
@@ -43,7 +59,7 @@ export default class MeasuresHistory extends React.PureComponent {
                     <div className="code-components-cell"><span>{this.props.issue.line}</span></div>
                 </td>
                 <td className="thin nowrap text-left">
-                    <div className="code-components-cell">
+                    <div>
                         <span><a data-tip data-for="toggler">{this.simplification(this.props.issue.message, 20)}</a>
                             <ReactTooltip id="toggler" getContent={[() => {return this.props.issue.message}]}></ReactTooltip>
                         </span>

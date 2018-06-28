@@ -30,13 +30,6 @@ export function findIssueAndToRedmine(project) {
                 result.rule = response.issues[i].rule;
                 result.severity = response.issues[i].severity;
                 result.type = response.issues[i].type;
-                console.log(result.component);
-                console.log(result.line);
-                console.log(result.message);
-                console.log(result.rule);
-                console.log(result.severity);
-                console.log(result.type);
-                console.log("--------------");
                 data[numberOfIssue] = result;
                 numberOfIssue++;
             }
