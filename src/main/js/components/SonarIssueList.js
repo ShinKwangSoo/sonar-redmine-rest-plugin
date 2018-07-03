@@ -61,10 +61,9 @@ export default class SonarIssueList extends React.PureComponent {
                             <button onClick={this.handleOpenModal}>Settings</button>
                             <ReactModal
                                 isOpen={this.state.showModal}
-                                contentLabel={RedmineSettings}
-                                style={customStyles}
-                            >
-                                <button onClick={this.handleCloseModal}>Close Modal</button>
+                                style={customStyles}>
+                                <div><RedmineSettings/> test1234</div>
+                                <button onClick={this.handleCloseModal}>Close</button>
                             </ReactModal>
                         </div>
                     </tr>
