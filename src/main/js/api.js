@@ -7,6 +7,8 @@ import {getJSON} from 'sonar-request'; // see https://github.com/SonarSource/son
 
 export function findIssueAndToRedmine(project) {
     return getJSON('/api/issues/search', {
+        p: 1,
+        ps: 50,
         componentKey: project.key
     }).then(function (response) {
         var data = [];

@@ -28,16 +28,14 @@ export default class MeasuresHistory extends React.PureComponent {
                     }
                 }
                 axios({
-/*                    proxy: {host:url,port:'80'},*/
-                    adapter: 'axios-jsonp',
-                    method: 'get',
+                    method: 'POST',
                     url: url + '/issues.json',
                     headers: {
                         'X-Redmine-API-KEY': acc,
-                        'Context-Type': 'application/json'
+                        'Content-Type': 'application/json'
                     }
                 }).then(function (restRedmine) {
-                    console.log(restRedmine)
+
                 });
             });
     }
@@ -64,7 +62,7 @@ export default class MeasuresHistory extends React.PureComponent {
                 </td>
                 <td className="thin nowrap text-left">
                     <div>
-                        <span><a data-tip data-for="toggler">{this.simplification(this.props.issue.message, 20)}</a>
+                        <span><a data-tip data-for="getConent">{this.simplification(this.props.issue.message, 20)}</a>
                             <ReactTooltip id="toggler" getContent={[() => {
                                 return this.props.issue.message
                             }]}></ReactTooltip>
