@@ -4,10 +4,21 @@
  * mailto:info AT sonarsource DOT com
  */
 import React from 'react';
-import MeasuresHistory from "./MeasuresHistory";
-import {findIssueAndToRedmine} from "../api";
-import RedmineSettings from "./RedmineSettings";
 import ReactModal from 'react-modal';
+import MeasuresHistory from "./MeasuresHistory";
+import RedmineSettings from "./RedmineSettings";
+import {findIssueAndToRedmine} from "../api";
+
+const customStyles = {
+    content : {
+        top                   : '50%',
+        left                  : '50%',
+        right                 : 'auto',
+        bottom                : 'auto',
+        marginRight           : '-50%',
+        transform             : 'translate(-50%, -50%)'
+    }
+};
 
 export default class SonarIssueList extends React.PureComponent {
     constructor() {
@@ -47,10 +58,11 @@ export default class SonarIssueList extends React.PureComponent {
                     <thead>
                     <tr>
                         <div>
-                            <button onClick={this.handleOpenModal}>Trigger Modal</button>
+                            <button onClick={this.handleOpenModal}>Settings</button>
                             <ReactModal
                                 isOpen={this.state.showModal}
                                 contentLabel={RedmineSettings}
+                                style={customStyles}
                             >
                                 <button onClick={this.handleCloseModal}>Close Modal</button>
                             </ReactModal>
