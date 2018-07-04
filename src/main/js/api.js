@@ -46,7 +46,7 @@ export function RedmineSettingsAPI() {
     var userData = [];
     var settingData=[];
 
-    axios.get('/api/settings/values?keys=sonar.redmine.hosturl,sonar.redmine.api-access-key').then(function (RedmineSettingsInfo) {
+   return axios.get('/api/settings/values?keys=sonar.redmine.hosturl,sonar.redmine.api-access-key').then(function (RedmineSettingsInfo) {
         const redmineSettingsData = RedmineSettingsInfo.data.settings.length;
         for (let i = 0; i < redmineSettingsData; i++) {
             if (RedmineSettingsInfo.data.settings[i].key === 'sonar.redmine.hosturl') {

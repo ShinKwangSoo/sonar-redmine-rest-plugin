@@ -7,7 +7,7 @@ import React from 'react';
 import ReactModal from 'react-modal';
 import MeasuresHistory from "./MeasuresHistory";
 import RedmineSettings from "./RedmineSettings";
-import {findIssueAndToRedmine} from "../api";
+import {findIssueAndToRedmine, RedmineSettingsAPI} from "../api";
 
 const customStyles = {
     content: {
@@ -26,7 +26,8 @@ export default class SonarIssueList extends React.PureComponent {
         this.state = {
             data: [],
             isOpen: false,
-            showModal: false
+            showModal: false,
+            settings: []
         };
         this.handleOpenModal = this.handleOpenModal.bind(this);
         this.handleCloseModal = this.handleCloseModal.bind(this);
@@ -48,6 +49,13 @@ export default class SonarIssueList extends React.PureComponent {
                 });
             }
         );
+        RedmineSettingsAPI().then(
+            (settingData) => {
+                this.setState({
+                    settings: settingData
+                });
+            }
+        );
     }
 
     render() {
@@ -58,12 +66,20 @@ export default class SonarIssueList extends React.PureComponent {
                     <thead>
                     <tr>
                         <div>
+                            {console.log("this.state.settings : ", this.state.settings)}
+                            {console.log("this.state.data : ", this.state.data)}
                             <button onClick={this.handleOpenModal}>Settings</button>
                             <ReactModal
                                 isOpen={this.state.showModal}
                                 style={customStyles}>
                                 <div>
-                                   <RedmineSettings/>
+                                    {this.state.settings.map(
+                                        (settings) =>
+                                            <RedmineSettings
+                                                settings={settings}
+                                            />
+                                    )
+                                    }
                                  </div>
                                 <button onClick={this.handleCloseModal}>Close</button>
                             </ReactModal>

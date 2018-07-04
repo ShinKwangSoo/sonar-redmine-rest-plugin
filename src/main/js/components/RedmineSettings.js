@@ -10,19 +10,10 @@ export default class RedmineSettings extends React.Component {
         this.state = {
             project: [],
             tracker: [],
-            user: [],
-            settings: []
+            user: []
         }
     }
-    componentDidMount() {
-        RedmineSettingsAPI().then(
-            (settingData) => {
-                this.setState({
-                       settings: settingData
-                });
-            }
-        );
-    }
+
     render() {
         return (
             <table>
@@ -32,8 +23,9 @@ export default class RedmineSettings extends React.Component {
                     </th>
                     <th>
                         <div className="selection">
-                            {console.log(this.state.settings)}
-                            <Select id="project-select" name="selected-state" value={this.state.settings}
+                            {console.log("this.state.settings : ",this.props.settings)}
+                            {console.log("this.state.settings[0] : ",this.props.settings[0])}
+                            <Select id="project-select" name="selected-state" value={this.props.settings[0]}
                                     searchable={true} simpleValue/>
                         </div>
                     </th>
@@ -44,7 +36,7 @@ export default class RedmineSettings extends React.Component {
                     </th>
                     <th>
                         <div className="selection">
-                            <Select id="trackers-select" name="selected-state" value={this.state.tracker.name}
+                            <Select id="trackers-select" name="selected-state" value={this.props.settings[1]}
                                     searchable={true} simpleValue/>
                         </div>
                     </th>
@@ -55,7 +47,7 @@ export default class RedmineSettings extends React.Component {
                     </th>
                     <th>
                         <div className="selection">
-                            <Select id="users-select" name="selected-state" value={this.state.user.lastname}
+                            <Select id="users-select" name="selected-state" value={this.props.settings[2]}
                                     searchable={true}
                                     simpleValue/>
                         </div>
