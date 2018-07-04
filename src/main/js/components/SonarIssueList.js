@@ -10,13 +10,13 @@ import RedmineSettings from "./RedmineSettings";
 import {findIssueAndToRedmine} from "../api";
 
 const customStyles = {
-    content : {
-        top                   : '50%',
-        left                  : '50%',
-        right                 : 'auto',
-        bottom                : 'auto',
-        marginRight           : '-50%',
-        transform             : 'translate(-50%, -50%)'
+    content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)'
     }
 };
 
@@ -62,7 +62,9 @@ export default class SonarIssueList extends React.PureComponent {
                             <ReactModal
                                 isOpen={this.state.showModal}
                                 style={customStyles}>
-                                <div><RedmineSettings/> test1234</div>
+                                <div>
+                                   <RedmineSettings/>
+                                 </div>
                                 <button onClick={this.handleCloseModal}>Close</button>
                             </ReactModal>
                         </div>

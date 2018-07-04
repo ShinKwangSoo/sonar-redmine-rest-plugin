@@ -9,7 +9,7 @@ import axios from 'axios';
 
 export default class MeasuresHistory extends React.PureComponent {
     constructor(props) {
-        super();
+        super(props);
         this.IssueToRedmine = this.IssueToRedmine.bind(this);
     }
 
@@ -20,11 +20,9 @@ export default class MeasuresHistory extends React.PureComponent {
                 for (let i = 0; i < sonarkeylength; i++) {
                     if (sonarPredmine.data.settings[i].key === 'sonar.redmine.hosturl') {
                         var url = sonarPredmine.data.settings[i].value;
-                        console.log(url);
                     }
                     else {
                         var acc = sonarPredmine.data.settings[i].value;
-                        console.log(acc);
                     }
                 }
                 axios({
@@ -35,7 +33,6 @@ export default class MeasuresHistory extends React.PureComponent {
                         'Content-Type': 'application/json'
                     }
                 }).then(function (restRedmine) {
-
                 });
             });
     }

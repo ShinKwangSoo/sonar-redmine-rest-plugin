@@ -3,7 +3,8 @@
  * All rights reserved
  * mailto:info AT sonarsource DOT com
  */
-import {getJSON} from 'sonar-request'; // see https://github.com/SonarSource/sonarqube/blob/master/server/sonar-web/src/main/js/app/utils/exposeLibraries.js
+import {getJSON} from 'sonar-request';
+import axios from "axios"; // see https://github.com/SonarSource/sonarqube/blob/master/server/sonar-web/src/main/js/app/utils/exposeLibraries.js
 
 export function findIssueAndToRedmine(project) {
     return getJSON('/api/issues/search', {
@@ -14,7 +15,6 @@ export function findIssueAndToRedmine(project) {
         var data = [];
         var numberOfIssue = 0;
         const numberOfIssueList = response.issues.length;
-        console.log(response.issues.length);
         if (numberOfIssueList > 0) {
             for (let i = 0; i < numberOfIssueList; i++) {
                 let result = {
@@ -37,6 +37,89 @@ export function findIssueAndToRedmine(project) {
             }
         }
         return data;
+    });
+}
+
+export function RedmineSettingsAPI() {
+    var projectData = [];
+    var trackerData = [];
+    var userData = [];
+    var settingData=[];
+
+    axios.get('/api/settings/values?keys=sonar.redmine.hosturl,sonar.redmine.api-access-key').then(function (RedmineSettingsInfo) {
+        const redmineSettingsData = RedmineSettingsInfo.data.settings.length;
+        for (let i = 0; i < redmineSettingsData; i++) {
+            if (RedmineSettingsInfo.data.settings[i].key === 'sonar.redmine.hosturl') {
+                var url = RedmineSettingsInfo.data.settings[i].value;
+            }
+            else {
+                var acc = RedmineSettingsInfo.data.settings[i].value;
+            }
+        }
+        axios({
+            headers: {
+                'X-Redmine-API-KEY': acc,
+                'Content-Type': 'application/json'
+            },
+            limit: '500',
+            method: 'get',
+            url: url + '/projects.json'
+        }).then(function (RedmineProjectInfo) {
+            var number = 0;
+            for (let i = 0; i < RedmineProjectInfo.data.projects.length; i++) {
+                let projects = {
+                    id: RedmineProjectInfo.data.projects[i].id,
+                    name: ''
+                };
+                projects.name = RedmineProjectInfo.data.projects[i].name;
+                projectData[number] = projects
+                number++;
+            }
+            settingData[0]=projectData;
+        });
+        axios({
+            headers: {
+                'X-Redmine-API-KEY': acc,
+                'Content-Type': 'application/json'
+            },
+            method: 'get',
+            url: url + '/trackers.json'
+        }).then(function (RedmineTrackerInfo) {
+            var number = 0;
+            for (let i = 0; i < RedmineTrackerInfo.data.trackers.length; i++) {
+                let trackers = {
+                    id: RedmineTrackerInfo.data.trackers[i].id,
+                    name: ''
+                };
+                trackers.name = RedmineTrackerInfo.data.trackers[i].name;
+                trackerData[number] = trackers
+                number++;
+            }
+            settingData[1]=trackerData;
+        });
+        axios({
+            headers: {
+                'X-Redmine-API-KEY': acc,
+                'Content-Type': 'application/json'
+            },
+            method: 'get',
+            url: url + '/users.json'
+        }).then(function (RedmineUserInfo) {
+            var number = 0;
+            for (let i = 0; i < RedmineUserInfo.data.users.length; i++) {
+                let users = {
+                    id: RedmineUserInfo.data.users[i].id,
+                    firstname: '',
+                    lastname: ''
+                };
+                users.firstname = RedmineUserInfo.data.users[i].firstname;
+                users.lastname = RedmineUserInfo.data.users[i].lastname;
+                userData[number] = users
+                number++;
+            }
+            settingData[2]=userData;
+        });
+        return settingData;
     });
 }
 
