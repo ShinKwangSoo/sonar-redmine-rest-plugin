@@ -66,8 +66,6 @@ export default class SonarIssueList extends React.PureComponent {
                     <thead>
                     <tr>
                         <div>
-                            {console.log("this.state.settings : ", this.state.settings)}
-                            {console.log("this.state.data : ", this.state.data)}
                             <button onClick={this.handleOpenModal}>Settings</button>
                             <ReactModal
                                 isOpen={this.state.showModal}
