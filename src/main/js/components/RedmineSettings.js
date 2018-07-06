@@ -1,33 +1,41 @@
 import React from "react";
 import Select from 'react-select';
-import {RedmineSettingsAPI} from "../api";
 
 
 export default class RedmineSettings extends React.Component {
-
     constructor(props) {
-        super(props)
-        this.state = {
-            project: [],
-            tracker: [],
-            user: []
-        }
+        super(props);
+        this.RedmineProjectList = this.RedmineProjectList.bind(this);
     }
+
+    RedmineProjectList() {
+        let redmineprojectName = [];
+        for(let i=0, redmineprojectNumber=0; i<this.props.container[0].length; i++){
+            let result={
+                value:this.props.container[0][i].name,
+                label:this.props.container[0][i].name,
+                id:this.props.container[0][i].id
+            }
+            redmineprojectName[redmineprojectNumber]= result
+            redmineprojectNumber++;
+        }
+        return redmineprojectName;
+    }
+
 
     render() {
         return (
             <table>
                 <tr>
                     <th>
+                        {console.log(this.RedmineProjectList())}
                         <div className="code-components-cell"><span><h3>Redmine Projects : </h3></span></div>
                     </th>
                     <th>
-                        <div className="selection">
-                            {console.log("this.state.settings : ",this.props.settings)}
-                            {console.log("this.state.settings[0] : ",this.props.settings[0])}
-                            <Select id="project-select" name="selected-state" value={this.props.settings[0]}
+                        <span className="selection">
+                            <Select id="project-select" name="selected-state" options={this.RedmineProjectList()}
                                     searchable={true} simpleValue/>
-                        </div>
+                        </span>
                     </th>
                 </tr>
                 <tr>
@@ -36,7 +44,7 @@ export default class RedmineSettings extends React.Component {
                     </th>
                     <th>
                         <div className="selection">
-                            <Select id="trackers-select" name="selected-state" value={this.props.settings[1]}
+                            <Select id="trackers-select" name="selected-state" options={this.props.container[1].all}
                                     searchable={true} simpleValue/>
                         </div>
                     </th>
@@ -47,7 +55,7 @@ export default class RedmineSettings extends React.Component {
                     </th>
                     <th>
                         <div className="selection">
-                            <Select id="users-select" name="selected-state" value={this.props.settings[2]}
+                            <Select id="users-select" name="selected-state" options={this.props.container[2].all}
                                     searchable={true}
                                     simpleValue/>
                         </div>
