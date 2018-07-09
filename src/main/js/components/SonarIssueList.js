@@ -27,10 +27,14 @@ export default class SonarIssueList extends React.PureComponent {
             data: [],
             isOpen: false,
             showModal: false,
-            settings: []
+            settings: [],
+            selectProjectValue: '',
+            selectTrackerValue: '',
+            selectUserValue:''
         };
         this.handleOpenModal = this.handleOpenModal.bind(this);
         this.handleCloseModal = this.handleCloseModal.bind(this);
+        this.submitFunction=this.submitFunction.bind(this);
     }
 
     handleOpenModal() {
@@ -39,6 +43,16 @@ export default class SonarIssueList extends React.PureComponent {
 
     handleCloseModal() {
         this.setState({showModal: false});
+    }
+
+    submitFunction(){
+        this.setState({
+            selectProjectValue: this.props.selectProjectValue,
+            selectTrackerValue: this.props.selectTrackerValue,
+            selectUserValue:this.props.selectUserValue
+        })
+        console.log("state : ",this.state.selectProjectValue, this.state.selectTrackerValue, this.state.selectUserValue)
+        console.log("props : ",this.props.selectProjectValue, this.props.selectTrackerValue, this.props.selectUserValue)
     }
 
     componentDidMount() {
@@ -73,6 +87,7 @@ export default class SonarIssueList extends React.PureComponent {
                                 <div>
                                     <RedmineSettings container={this.state.settings}/>
                                  </div>
+                                <button onClick={this.submitFunction}>Save</button>
                                 <button onClick={this.handleCloseModal}>Close</button>
                             </ReactModal>
                         </div>

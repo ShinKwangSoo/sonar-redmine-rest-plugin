@@ -23,6 +23,7 @@ package org.sonar.plugins.redmine.config;
 import org.sonar.api.PropertyType;
 import org.sonar.api.config.Configuration;
 import org.sonar.api.config.PropertyDefinition;
+import org.sonar.api.resources.Qualifiers;
 
 import java.util.List;
 
@@ -57,32 +58,30 @@ public class RedmineSettings {
                         .description("Example: http://demo.redmine.org/")
                         .category(CATEGORY)
                         .defaultValue("")
-                        .build()));
-               /* (PropertyDefinition.builder(PROJECT_KEY)
+                        .build()),
+                (PropertyDefinition.builder(PROJECT_KEY)
                         .name("PROJECT_KEY")
                         .description("Project KEY")
                         .category(CATEGORY)
                         .defaultValue("")
                         .onlyOnQualifiers(Qualifiers.PROJECT)
-                        .build())
+                        .build()),
                 (PropertyDefinition.builder(TRACKER_ID)
                         .name("TRACKER_NAME")
                         .description("Tracker name")
                         .category(CATEGORY)
-                       *//* .options(String.valueOf(RedmineAdapter.class.getMethod("getIssuePriorities",null)))*//*
                         .subCategory(NEED_PROJECT_KEY)
-                        .type(PropertyType.SINGLE_SELECT_LIST)
+                        .hidden()
                         .onlyOnQualifiers(Qualifiers.PROJECT)
                         .build()),
                 (PropertyDefinition.builder(PRIORITY_ID)
                         .name("Priority")
                         .description("issue priority")
                         .category(CATEGORY)
-                        *//*.options(String.valueOf(RedmineAdapter.class.getMethod("getProjectTracker",null)))*//*
                         .subCategory(NEED_PROJECT_KEY)
-                        .type(PropertyType.SINGLE_SELECT_LIST)
+                        .hidden()
                         .onlyOnQualifiers(Qualifiers.PROJECT)
-                        .build()));*/
+                        .build()));
     }
 }
 

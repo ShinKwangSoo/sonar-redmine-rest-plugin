@@ -1,25 +1,74 @@
 import React from "react";
 import Select from 'react-select';
 
-
 export default class RedmineSettings extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            selectProjectValue: '',
+            selectTrackerValue: '',
+            selectUserValue: ''
+        };
         this.RedmineProjectList = this.RedmineProjectList.bind(this);
+        this.RedmineTrackerList = this.RedmineTrackerList.bind(this);
+        this.RedmineUserList = this.RedmineUserList.bind(this);
+        this.updateProjectValue = this.updateProjectValue.bind(this);
+        this.updateTrackerValue = this.updateTrackerValue.bind(this);
+        this.updateUserValue = this.updateUserValue.bind(this);
     }
 
     RedmineProjectList() {
+        let redminetrackerName = [];
+        for (let i = 0, redminetrackerNumber = 0; i < this.props.container[0].length; i++) {
+            let result = {
+                value: this.props.container[0][i].id,
+                label: this.props.container[0][i].name,
+                id: this.props.container[0][i].id
+            };
+            redminetrackerName[redminetrackerNumber] = result;
+            redminetrackerNumber++;
+        }
+        return redminetrackerName;
+    }
+
+    RedmineTrackerList() {
+        let redmineUserName = [];
+        for (let i = 0, redmineUserNumber = 0; i < this.props.container[1].length; i++) {
+            let result = {
+                value: this.props.container[1][i].id,
+                label: this.props.container[1][i].name,
+                id: this.props.container[1][i].id
+            };
+            redmineUserName[redmineUserNumber] = result;
+            redmineUserNumber++;
+        }
+        return redmineUserName;
+    }
+
+    RedmineUserList() {
         let redmineprojectName = [];
-        for(let i=0, redmineprojectNumber=0; i<this.props.container[0].length; i++){
-            let result={
-                value:this.props.container[0][i].name,
-                label:this.props.container[0][i].name,
-                id:this.props.container[0][i].id
-            }
-            redmineprojectName[redmineprojectNumber]= result
+        for (let i = 0, redmineprojectNumber = 0; i < this.props.container[2].length; i++) {
+            let result = {
+                value: this.props.container[2][i].id,
+                label: this.props.container[2][i].firstname,
+                id: this.props.container[2][i].id
+            };
+            redmineprojectName[redmineprojectNumber] = result;
             redmineprojectNumber++;
         }
         return redmineprojectName;
+    }
+
+    updateProjectValue(ProjectValue) {
+        this.setState({selectProjectValue: ProjectValue});
+    }
+
+    updateTrackerValue(TrackerValue) {
+        this.setState({selectTrackerValue: TrackerValue});
+    }
+
+    updateUserValue(UserValue) {
+        this.setState({selectUserValue: UserValue});
     }
 
 
@@ -28,13 +77,19 @@ export default class RedmineSettings extends React.Component {
             <table>
                 <tr>
                     <th>
-                        {console.log(this.RedmineProjectList())}
                         <div className="code-components-cell"><span><h3>Redmine Projects : </h3></span></div>
                     </th>
                     <th>
                         <span className="selection">
-                            <Select id="project-select" name="selected-state" options={this.RedmineProjectList()}
-                                    searchable={true} simpleValue/>
+                            <Select id="project-select"
+                                    name="project-select"
+                                    options={this.RedmineProjectList()}
+                                    searchable={true}
+                                    value={this.state.selectProjectValue}
+                                    simpleValue
+                                    clearable={false}
+                                    onChange={this.updateProjectValue}
+                            />
                         </span>
                     </th>
                 </tr>
@@ -44,8 +99,15 @@ export default class RedmineSettings extends React.Component {
                     </th>
                     <th>
                         <div className="selection">
-                            <Select id="trackers-select" name="selected-state" options={this.props.container[1].all}
-                                    searchable={true} simpleValue/>
+                            <Select id="trackers-select"
+                                    name="trackers-select"
+                                    options={this.RedmineTrackerList()}
+                                    searchable={true}
+                                    value={this.state.selectTrackerValue}
+                                    simpleValue
+                                    clearable={false}
+                                    onChange={this.updateTrackerValue}
+                            />
                         </div>
                     </th>
                 </tr>
@@ -55,9 +117,15 @@ export default class RedmineSettings extends React.Component {
                     </th>
                     <th>
                         <div className="selection">
-                            <Select id="users-select" name="selected-state" options={this.props.container[2].all}
+                            <Select id="users-select"
+                                    name="users-select"
+                                    options={this.RedmineUserList()}
+                                    value={this.state.selectUserValue}
                                     searchable={true}
-                                    simpleValue/>
+                                    simpleValue
+                                    clearable={false}
+                                    onChange={this.updateUserValue}
+                            />
                         </div>
                     </th>
                 </tr>
