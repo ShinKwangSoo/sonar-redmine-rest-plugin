@@ -61,14 +61,17 @@ export default class RedmineSettings extends React.Component {
 
     updateProjectValue(ProjectValue) {
         this.setState({selectProjectValue: ProjectValue});
+        return this.state.selectProjectValue;
     }
 
     updateTrackerValue(TrackerValue) {
         this.setState({selectTrackerValue: TrackerValue});
+        return this.state.selectTrackerValue;
     }
 
     updateUserValue(UserValue) {
         this.setState({selectUserValue: UserValue});
+        return this.state.selectUserValue;
     }
 
 

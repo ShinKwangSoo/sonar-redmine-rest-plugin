@@ -50,9 +50,10 @@ export default class SonarIssueList extends React.PureComponent {
             selectProjectValue: this.props.selectProjectValue,
             selectTrackerValue: this.props.selectTrackerValue,
             selectUserValue:this.props.selectUserValue
-        })
+        });
+        this.handleCloseModal();
         console.log("state : ",this.state.selectProjectValue, this.state.selectTrackerValue, this.state.selectUserValue)
-        console.log("props : ",this.props.selectProjectValue, this.props.selectTrackerValue, this.props.selectUserValue)
+
     }
 
     componentDidMount() {

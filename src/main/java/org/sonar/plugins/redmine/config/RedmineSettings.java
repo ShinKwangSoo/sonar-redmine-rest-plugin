@@ -23,7 +23,6 @@ package org.sonar.plugins.redmine.config;
 import org.sonar.api.PropertyType;
 import org.sonar.api.config.Configuration;
 import org.sonar.api.config.PropertyDefinition;
-import org.sonar.api.resources.Qualifiers;
 
 import java.util.List;
 
@@ -36,7 +35,6 @@ public class RedmineSettings {
     public static final String PROJECT_KEY = "sonar.redmine.project-key";
     public static final String PRIORITY_ID = "sonar.redmine.priority-id";
     public static final String TRACKER_ID = "sonar.redmine.tracker-id";
-    public static final String NEED_PROJECT_KEY = "Sonar Redmine Project Settings";
     public static final String CATEGORY = "Sonar Redmine Plugin";
     private final Configuration settings;
 
@@ -44,7 +42,7 @@ public class RedmineSettings {
         this.settings = settings;
     }
 
-    public static List<PropertyDefinition> getProperties() throws NoSuchMethodException {
+    public static List<PropertyDefinition> getProperties() {
         return asList(
                 (PropertyDefinition.builder(API_KEY)
                         .name("API_ACCESS_KEY")
@@ -58,8 +56,8 @@ public class RedmineSettings {
                         .description("Example: http://demo.redmine.org/")
                         .category(CATEGORY)
                         .defaultValue("")
-                        .build()),
-                (PropertyDefinition.builder(PROJECT_KEY)
+                        .build()));
+/*                (PropertyDefinition.builder(PROJECT_KEY)
                         .name("PROJECT_KEY")
                         .description("Project KEY")
                         .category(CATEGORY)
@@ -81,7 +79,7 @@ public class RedmineSettings {
                         .subCategory(NEED_PROJECT_KEY)
                         .hidden()
                         .onlyOnQualifiers(Qualifiers.PROJECT)
-                        .build()));
+                        .build()));*/
     }
 }
 
