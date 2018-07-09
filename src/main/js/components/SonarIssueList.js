@@ -83,6 +83,7 @@ export default class SonarIssueList extends React.PureComponent {
                         <div>
                             <button onClick={this.handleOpenModal}>Settings</button>
                             <ReactModal
+                                onChange={}
                                 isOpen={this.state.showModal}
                                 style={customStyles}>
                                 <div>

@@ -119,30 +119,6 @@ export function RedmineSettingsAPI() {
             }
             settingData[2]=userData;
         });
-
-       axios({
-           headers: {
-               'X-Redmine-API-KEY': acc,
-               'Content-Type': 'application/json'
-           },
-           method: 'get',
-           url: url + '/users.json'
-       }).then(function (RedmineUserInfo) {
-           var number = 0;
-           for (let i = 0; i < RedmineUserInfo.data.users.length; i++) {
-               let users = {
-                   id: RedmineUserInfo.data.users[i].id,
-                   firstname: '',
-                   lastname: ''
-               };
-               users.firstname = RedmineUserInfo.data.users[i].firstname;
-               users.lastname = RedmineUserInfo.data.users[i].lastname;
-               userData[number] = users
-               number++;
-           }
-           settingData[3]=userData;
-       });
-
         return settingData;
     });
 }
