@@ -21,7 +21,6 @@ package org.sonar.plugins.redmine;
 
 import org.sonar.api.Plugin;
 import org.sonar.plugins.redmine.client.RedmineAdapter;
-import org.sonar.plugins.redmine.config.RedmineProjectSettings;
 import org.sonar.plugins.redmine.config.RedmineSettings;
 import org.sonar.plugins.redmine.exceptions.*;
 import org.sonar.plugins.redmine.reviews.RedmineIssueFactory;
@@ -43,7 +42,6 @@ public class RedminePlugin implements Plugin {
         // tutorial on settings
         context.addExtensions(RedmineSettings.getProperties())
                 .addExtension(RedmineAdapter.class);
-        context.addExtension(RedmineProjectSettings.getProperties());
         // UI
         context.addExtension(SonarToRedmine.class);
         //RedmineWidget.class, RedmineDevelopersWidget.class, RedmineSettingsPage.class,

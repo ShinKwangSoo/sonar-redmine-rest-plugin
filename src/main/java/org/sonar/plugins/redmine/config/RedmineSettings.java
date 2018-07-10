@@ -23,6 +23,7 @@ package org.sonar.plugins.redmine.config;
 import org.sonar.api.PropertyType;
 import org.sonar.api.config.Configuration;
 import org.sonar.api.config.PropertyDefinition;
+import org.sonar.api.resources.Qualifiers;
 
 import java.util.List;
 
@@ -34,6 +35,7 @@ public class RedmineSettings {
     public static final String REDMINE_URL = "sonar.redmine.hosturl";
     public static final String PROJECT_KEY = "sonar.redmine.project-key";
     public static final String PRIORITY_ID = "sonar.redmine.priority-id";
+    public static final String USER_ID = "sonar.redmine.user-id";
     public static final String TRACKER_ID = "sonar.redmine.tracker-id";
     public static final String CATEGORY = "Sonar Redmine Plugin";
     private final Configuration settings;
@@ -56,8 +58,8 @@ public class RedmineSettings {
                         .description("Example: http://demo.redmine.org/")
                         .category(CATEGORY)
                         .defaultValue("")
-                        .build()));
-/*                (PropertyDefinition.builder(PROJECT_KEY)
+                        .build()),
+                (PropertyDefinition.builder(PROJECT_KEY)
                         .name("PROJECT_KEY")
                         .description("Project KEY")
                         .category(CATEGORY)
@@ -68,18 +70,14 @@ public class RedmineSettings {
                         .name("TRACKER_NAME")
                         .description("Tracker name")
                         .category(CATEGORY)
-                        .subCategory(NEED_PROJECT_KEY)
-                        .hidden()
                         .onlyOnQualifiers(Qualifiers.PROJECT)
                         .build()),
-                (PropertyDefinition.builder(PRIORITY_ID)
-                        .name("Priority")
-                        .description("issue priority")
+                (PropertyDefinition.builder(USER_ID)
+                        .name("User_ID")
+                        .description("User_ID")
                         .category(CATEGORY)
-                        .subCategory(NEED_PROJECT_KEY)
-                        .hidden()
                         .onlyOnQualifiers(Qualifiers.PROJECT)
-                        .build()));*/
+                        .build()));
     }
 }
 

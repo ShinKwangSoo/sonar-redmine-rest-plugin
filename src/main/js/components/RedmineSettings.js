@@ -1,20 +1,19 @@
 import React from "react";
 import Select from 'react-select';
 
+const labelStyle = {
+    width:"150",
+    minWidth: "100",
+
+};
+
 export default class RedmineSettings extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            selectProjectValue: '',
-            selectTrackerValue: '',
-            selectUserValue: ''
-        };
         this.RedmineProjectList = this.RedmineProjectList.bind(this);
         this.RedmineTrackerList = this.RedmineTrackerList.bind(this);
         this.RedmineUserList = this.RedmineUserList.bind(this);
-        this.updateProjectValue = this.updateProjectValue.bind(this);
-        this.updateTrackerValue = this.updateTrackerValue.bind(this);
-        this.updateUserValue = this.updateUserValue.bind(this);
+
     }
 
     RedmineProjectList() {
@@ -59,22 +58,6 @@ export default class RedmineSettings extends React.Component {
         return redmineprojectName;
     }
 
-    updateProjectValue(ProjectValue) {
-        this.setState({selectProjectValue: ProjectValue});
-        return this.state.selectProjectValue;
-    }
-
-    updateTrackerValue(TrackerValue) {
-        this.setState({selectTrackerValue: TrackerValue});
-        return this.state.selectTrackerValue;
-    }
-
-    updateUserValue(UserValue) {
-        this.setState({selectUserValue: UserValue});
-        return this.state.selectUserValue;
-    }
-
-
     render() {
         return (
             <table>
@@ -86,12 +69,14 @@ export default class RedmineSettings extends React.Component {
                         <span className="selection">
                             <Select id="project-select"
                                     name="project-select"
+                                    style={labelStyle}
                                     options={this.RedmineProjectList()}
                                     searchable={true}
-                                    value={this.state.selectProjectValue}
+                                    value={this.props.projectDefault}
                                     simpleValue
+                                    autoFocus={true}
                                     clearable={false}
-                                    onChange={this.updateProjectValue}
+                                    onChange={this.props.projectValue}
                             />
                         </span>
                     </th>
@@ -104,12 +89,14 @@ export default class RedmineSettings extends React.Component {
                         <div className="selection">
                             <Select id="trackers-select"
                                     name="trackers-select"
+                                    style={labelStyle}
                                     options={this.RedmineTrackerList()}
                                     searchable={true}
-                                    value={this.state.selectTrackerValue}
+                                    value={this.props.trackerDefault}
                                     simpleValue
+                                    autoFocus={true}
                                     clearable={false}
-                                    onChange={this.updateTrackerValue}
+                                    onChange={this.props.trackerValue}
                             />
                         </div>
                     </th>
@@ -122,12 +109,14 @@ export default class RedmineSettings extends React.Component {
                         <div className="selection">
                             <Select id="users-select"
                                     name="users-select"
+                                    style={labelStyle}
                                     options={this.RedmineUserList()}
-                                    value={this.state.selectUserValue}
+                                    value={this.props.userDefault}
                                     searchable={true}
                                     simpleValue
+                                    autoFocus={true}
                                     clearable={false}
-                                    onChange={this.updateUserValue}
+                                    onChange={this.props.userValue}
                             />
                         </div>
                     </th>

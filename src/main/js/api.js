@@ -44,9 +44,9 @@ export function RedmineSettingsAPI() {
     var projectData = [];
     var trackerData = [];
     var userData = [];
-    var settingData=[];
+    var settingData = [];
 
-   return axios.get('/api/settings/values?keys=sonar.redmine.hosturl,sonar.redmine.api-access-key').then(function (RedmineSettingsInfo) {
+    return axios.get('/api/settings/values?keys=sonar.redmine.hosturl,sonar.redmine.api-access-key').then(function (RedmineSettingsInfo) {
         const redmineSettingsData = RedmineSettingsInfo.data.settings.length;
         for (let i = 0; i < redmineSettingsData; i++) {
             if (RedmineSettingsInfo.data.settings[i].key === 'sonar.redmine.hosturl') {
@@ -61,21 +61,20 @@ export function RedmineSettingsAPI() {
                 'X-Redmine-API-KEY': acc,
                 'Content-Type': 'application/json'
             },
-            limit: '500',
             method: 'get',
             url: url + '/projects.json'
         }).then(function (RedmineProjectInfo) {
             var number = 0;
             for (let i = 0; i < RedmineProjectInfo.data.projects.length; i++) {
                 let projects = {
-                    id: RedmineProjectInfo.data.projects[i].id,
+                    id: RedmineProjectInfo.data.projects[i].identifier,
                     name: ''
                 };
                 projects.name = RedmineProjectInfo.data.projects[i].name;
                 projectData[number] = projects
                 number++;
             }
-            settingData[0]=projectData;
+            settingData[0] = projectData;
         });
         axios({
             headers: {
@@ -95,7 +94,7 @@ export function RedmineSettingsAPI() {
                 trackerData[number] = trackers
                 number++;
             }
-            settingData[1]=trackerData;
+            settingData[1] = trackerData;
         });
         axios({
             headers: {
@@ -117,73 +116,129 @@ export function RedmineSettingsAPI() {
                 userData[number] = users
                 number++;
             }
-            settingData[2]=userData;
+            settingData[2] = userData;
         });
         return settingData;
     });
 }
 
-export function findVersionsAndMeasures(project) {
-
-    return getJSON('/api/project_analyses/search', {
-        project: project.key,
-        p: 1,
-        ps: 500,
-    }).then(function (responseAnalyses) {
-        const numberOfAnalyses = responseAnalyses.analyses.length;
-        if (numberOfAnalyses > 0) {
-
-            return getJSON('/api/measures/search_history', {
-                component: project.key,
-                metrics: "alert_status,bugs,vulnerabilities,code_smells,reliability_rating,security_rating,sqale_rating",
-                ps: 1000
-            }).then(function (responseMetrics) {
-                var data = [];
-                var numberOfVersions = 0;
-
-                for (let i = 0; i < numberOfAnalyses; i++) {
-                    let analysis = responseAnalyses.analyses[i];
-                    for (let j = 0; j < analysis.events.length; j++) {
-                        if (analysis.events[j].category === "VERSION") {
-                            let result = {
-                                version: analysis.events[j].name,
-                                alert_status: "",
-                                bugs: "0", vulnerabilities: "0", code_smells: "0",
-                                reliability_rating: "", security_rating: "", sqale_rating: ""
-                            };
-                            const numberOfMeasuresRetrieved = 7;
-
-                            for (let k = 0; k < numberOfMeasuresRetrieved; k++) {
-                                for (let d = 0; d < responseMetrics.measures[k].history.length; d++) {
-                                    if (responseMetrics.measures[k].history[d].date === responseAnalyses.analyses[i].date) {
-                                        //console.log(responseMetrics.measures[k].metric);
-                                        if (responseMetrics.measures[k].metric === "bugs") {
-                                            result.bugs = responseMetrics.measures[k].history[d].value;
-                                        } else if (responseMetrics.measures[k].metric === "vulnerabilities") {
-                                            result.vulnerabilities = responseMetrics.measures[k].history[d].value;
-                                        } else if (responseMetrics.measures[k].metric === "code_smells") {
-                                            result.code_smells = responseMetrics.measures[k].history[d].value;
-                                        } else if (responseMetrics.measures[k].metric === "alert_status") {
-                                            result.alert_status = responseMetrics.measures[k].history[d].value;
-                                        } else if (responseMetrics.measures[k].metric === "reliability_rating") {
-                                            result.reliability_rating = responseMetrics.measures[k].history[d].value;
-                                        } else if (responseMetrics.measures[k].metric === "security_rating") {
-                                            result.security_rating = responseMetrics.measures[k].history[d].value;
-                                        } else if (responseMetrics.measures[k].metric === "sqale_rating") {
-                                            result.sqale_rating = responseMetrics.measures[k].history[d].value;
-                                        }
-                                    }
-                                }
-                            }
-
-                            data[numberOfVersions] = result;
-                            numberOfVersions++;
-                        }
-                    }
-                }
-                //console.table(data);
-                return data;
-            });
+export function saveSettingToRedmine(project) {
+    let saveSettingsData = [];
+    return axios({
+        method: 'GET',
+        url: '/api/settings/values?component=' + project.key + '&keys=sonar.redmine.hosturl,sonar.redmine.api-access-key,sonar.redmine.project-key,sonar.redmine.tracker-id,sonar.redmine.user-id'
+    }).then(function (RedmineSettingsInfo) {
+        const redmineSettingsData = RedmineSettingsInfo.data.settings.length;
+        for (let i = 0; i < redmineSettingsData; i++) {
+            if (RedmineSettingsInfo.data.settings[i].key === 'sonar.redmine.hosturl') {
+                var url = RedmineSettingsInfo.data.settings[i].value;
+            }
+            else if (RedmineSettingsInfo.data.settings[i].key === 'sonar.redmine.api-access-key') {
+                var acc = RedmineSettingsInfo.data.settings[i].value;
+            }
+            else if (RedmineSettingsInfo.data.settings[i].key === 'sonar.redmine.project-key') {
+                var project = RedmineSettingsInfo.data.settings[i].value;
+            }
+            else if (RedmineSettingsInfo.data.settings[i].key === 'sonar.redmine.tracker-id') {
+                var tracker = RedmineSettingsInfo.data.settings[i].value;
+            }
+            else {
+                var user = RedmineSettingsInfo.data.settings[i].value;
+            }
         }
+        axios({
+            headers: {
+                'X-Redmine-API-KEY': acc,
+                'Content-Type': 'application/json'
+            },
+            method: 'get',
+            url: url + '/projects/' + project + '.json'
+        }).then(function (RedmineProjectInfo) {
+            if (RedmineProjectInfo.data.project != null) {
+                let projects = {
+                    id: RedmineProjectInfo.data.project.identifier,
+                    value: RedmineProjectInfo.data.project.name,
+                    label: RedmineProjectInfo.data.project.name
+                };
+                saveSettingsData[0] = projects;
+            }
+        });
+        axios({
+            headers: {
+                'X-Redmine-API-KEY': acc,
+                'Content-Type': 'application/json'
+            },
+            method: 'get',
+            url: url + '/projects/' + project + '.json?include=trackers'
+        }).then(function (RedmineTrackerInfo) {
+            for (let i = 0; i < RedmineTrackerInfo.data.project.trackers.length; i++) {
+                if (RedmineTrackerInfo.data.project.trackers[i].id == parseInt(tracker)) {
+                    let trackers = {
+                        id: RedmineTrackerInfo.data.project.trackers[i].id,
+                        value: RedmineTrackerInfo.data.project.trackers[i].name,
+                        label: RedmineTrackerInfo.data.project.trackers[i].name
+                    };
+                    saveSettingsData[1] = trackers
+                }
+            }
+        });
+
+        axios({
+            headers: {
+                'X-Redmine-API-KEY': acc,
+                'Content-Type': 'application/json'
+            },
+            method: 'get',
+            url: url + '/users/' + user + '.json'
+        }).then(function (RedmineUserInfo) {
+            let users = {
+                id: RedmineUserInfo.data.user.id,
+                value: RedmineUserInfo.data.user.firstname,
+                label: RedmineUserInfo.data.user.firstname
+            };
+            saveSettingsData[2] = users;
+        });
+        console.log("saveSettingsData", saveSettingsData);
+        return saveSettingsData;
     });
+}
+
+export function IssueToRedmine() {
+    axios.get('/api/settings/values?keys=sonar.redmine.hosturl,sonar.redmine.api-access-key')
+        .then(function (sonarPredmine) {
+            const sonarkeylength = sonarPredmine.data.settings.length;
+            for (let i = 0; i < sonarkeylength; i++) {
+                if (sonarPredmine.data.settings[i].key === 'sonar.redmine.hosturl') {
+                    var url = sonarPredmine.data.settings[i].value;
+                }
+                else {
+                    var acc = sonarPredmine.data.settings[i].value;
+                }
+            }
+            axios({
+                method: 'POST',
+                url: url + '/issues.json',
+                headers: {
+                    'X-Redmine-API-KEY': acc,
+                    'Content-Type': 'application/json'
+                }
+            }).then(function (restRedmine) {
+                test
+            });
+        });
+}
+
+export function settingToRedmineC(project, redmine_projectid, redmine_trackerid, redmine_userid) {
+    axios({
+        method: 'POST',
+        url: '/api/settings/set?component='+project.key+'&key=sonar.redmine.user-id&value='+redmine_projectid
+    });
+    axios({
+        method: 'POST',
+        url: '/api/settings/set?component='+project.key+'&key=sonar.redmine.user-id&value='+redmine_trackerid
+    });
+    axios({
+        method: 'POST',
+        url: '/api/settings/set?component='+project.key+'&key=sonar.redmine.user-id&value='+redmine_userid
+    })
 }
