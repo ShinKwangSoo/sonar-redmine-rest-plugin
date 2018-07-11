@@ -28,21 +28,10 @@ export default class SonarIssueList extends React.PureComponent {
             isOpen: false,
             showModal: false,
             settings: [],
-            selectProjectValue: {
-                id: '',
-                value: '',
-                label: ''
-            },
-            selectTrackerValue: {
-                id: '',
-                value: '',
-                label: ''
-            },
-            selectUserValue: {
-                id: '',
-                value: '',
-                label: ''
-            }
+            saveData: [],
+            selectProjectValue: '',
+            selectTrackerValue: '',
+            selectUserValue: ''
         };
         this.handleOpenModal = this.handleOpenModal.bind(this);
         this.handleCloseModal = this.handleCloseModal.bind(this);
@@ -50,7 +39,6 @@ export default class SonarIssueList extends React.PureComponent {
         this.updateProjectValue = this.updateProjectValue.bind(this);
         this.updateTrackerValue = this.updateTrackerValue.bind(this);
         this.updateUserValue = this.updateUserValue.bind(this);
-        this.SonarRedminePropertySettings = this.SonarRedminePropertySettings.bind(this);
     }
 
     handleOpenModal() {
@@ -74,7 +62,6 @@ export default class SonarIssueList extends React.PureComponent {
         this.handleCloseModal();
 
     }
-
 
     updateProjectValue(e) {
         console.log("updateProjectValue e: ", e);
@@ -108,7 +95,9 @@ export default class SonarIssueList extends React.PureComponent {
 
         saveSettingToRedmine(this.props.project).then(
             (saveData) => {
-                this.SonarRedminePropertySettings(saveData)
+                console.log("savaData: ", saveData)
+                console.log("saveData.length", saveData.length)
+                this.setState({});
             }
         );
 
@@ -120,21 +109,6 @@ export default class SonarIssueList extends React.PureComponent {
             }
         );
     }
-
-    SonarRedminePropertySettings(data) {
-        console.log("data : ", data);
-        console.log("typeopf(data) : ", typeof(data));
-        console.log("data.length : ", data.length);
-        this.setState({
-            selectProjectValue: data,
-            selectTrackerValue: data,
-            selectUserValue: data
-        });
-        console.log(this.state.selectProjectValue);
-        console.log(this.state.selectTrackerValue);
-        console.log(this.state.selectUserValue);
-    }
-
 
     render() {
         // Data Gathered: {JSON.stringify(this.state.data)}
@@ -149,7 +123,8 @@ export default class SonarIssueList extends React.PureComponent {
                                 isOpen={this.state.showModal}
                                 style={customStyles}>
                                 <div>
-                                    <RedmineSettings container={this.state.settings}
+                                    <RedmineSettings saveData={this.state.saveData}
+                                                     container={this.state.settings}
                                                      projectDefault={this.state.selectProjectValue}
                                                      trackerDefault={this.state.selectTrackerValue}
                                                      userDefault={this.state.selectUserValue}

@@ -13,7 +13,6 @@ export default class RedmineSettings extends React.Component {
         this.RedmineProjectList = this.RedmineProjectList.bind(this);
         this.RedmineTrackerList = this.RedmineTrackerList.bind(this);
         this.RedmineUserList = this.RedmineUserList.bind(this);
-
     }
 
     RedmineProjectList() {

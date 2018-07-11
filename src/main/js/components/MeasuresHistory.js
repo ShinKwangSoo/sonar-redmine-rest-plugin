@@ -5,11 +5,23 @@
  */
 import React from 'react';
 import ReactTooltip from 'react-tooltip'
-import {IssueToRedmine} from "../api";
+import {IssueToRedmine,TFRedmine} from "../api";
 
 export default class MeasuresHistory extends React.PureComponent {
     constructor(props) {
         super(props);
+        this.simplification=this.simplification.bind(this);
+        this.TFRedmineToSend=this.TFRedmineToSend.bind(this);
+    }
+
+    TFRedmineToSend(){
+        if(TFRedmine(this.props.issue.key)===false) {
+            <button onClick={IssueToRedmine(this.props.issue.key, this.props.issue.rule, this.props.issue.message)}>
+                To_Redmine
+            </button>
+        }else {
+            console.log(TFRedmine(this.props.issue.key))
+        }
     }
 
     simplification = (line, maxLength) => {
@@ -44,9 +56,7 @@ export default class MeasuresHistory extends React.PureComponent {
                 <td className="thin nowrap text-center">
                     <div className="code-components-cell">
                         <span>
-                        <button onClick={IssueToRedmine}>
-                            To_Redmine
-                        </button>
+                            {this.TFRedmineToSend()}
                     </span>
                     </div>
                 </td>
