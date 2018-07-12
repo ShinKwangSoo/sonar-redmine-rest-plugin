@@ -5,22 +5,30 @@
  */
 import React from 'react';
 import ReactTooltip from 'react-tooltip'
-import {IssueToRedmine,TFRedmine} from "../api";
+import {IssueToRedmine, TFRedmine} from "../api";
 
 export default class MeasuresHistory extends React.PureComponent {
     constructor(props) {
         super(props);
-        this.simplification=this.simplification.bind(this);
-        this.TFRedmineToSend=this.TFRedmineToSend.bind(this);
+        this.simplification = this.simplification.bind(this);
+        this.TFRedmineToSend = this.TFRedmineToSend.bind(this);
     }
 
-    TFRedmineToSend(){
-        if(TFRedmine(this.props.issue.key)===false) {
-            <button onClick={IssueToRedmine(this.props.issue.key, this.props.issue.rule, this.props.issue.message)}>
-                To_Redmine
-            </button>
-        }else {
-            console.log(TFRedmine(this.props.issue.key))
+    TFRedmineToSend() {
+        console.log(TFRedmine(this.props.issue.key));
+        if (TFRedmine(this.props.issue.key) !== false) {
+            let issuekey=this.props.issue.key;
+            let rule=this.props.issue.rule;
+            let message=this.props.issue.message;
+            return (
+                <button onClick={function() {IssueToRedmine(issuekey,rule,message)}}>
+                    To_Redmine
+                </button>);
+        } else {
+            return (
+                <button onClick={function(){{window.open("http://naver.com")}}} color={'#194D33'}>
+                    Go_Redmine
+                </button>);
         }
     }
 

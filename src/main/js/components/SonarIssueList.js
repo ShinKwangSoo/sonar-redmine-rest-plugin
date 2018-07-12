@@ -7,7 +7,14 @@ import React from 'react';
 import ReactModal from 'react-modal';
 import MeasuresHistory from "./MeasuresHistory";
 import RedmineSettings from "./RedmineSettings";
-import {findIssueAndToRedmine, RedmineSettingsAPI, saveSettingToRedmine, settingToRedmineC} from "../api";
+import {
+    findIssueAndToRedmine,
+    RedmineSettingsAPI,
+    saveSettingToRedmine,
+    settingToRedmineProject,
+    settingToRedmineTracker,
+    settingToRedmineUser
+} from "../api";
 
 const customStyles = {
     content: {
@@ -29,9 +36,12 @@ export default class SonarIssueList extends React.PureComponent {
             showModal: false,
             settings: [],
             saveData: [],
-            selectProjectValue: '',
-            selectTrackerValue: '',
-            selectUserValue: ''
+            selectProjectValue: {},
+            selectTrackerValue: {},
+            selectUserValue: {},
+            changeProject: false,
+            changeTracker: false,
+            changeUser: false,
         };
         this.handleOpenModal = this.handleOpenModal.bind(this);
         this.handleCloseModal = this.handleCloseModal.bind(this);
@@ -44,6 +54,9 @@ export default class SonarIssueList extends React.PureComponent {
     handleOpenModal() {
         this.setState({
             showModal: true,
+            selectProjectValue: this.state.saveData[0],
+            selectTrackerValue: this.state.saveData[1],
+            selectUserValue: this.state.saveData[2]
         });
     }
 
@@ -57,30 +70,49 @@ export default class SonarIssueList extends React.PureComponent {
             selectTrackerValue: this.state.selectTrackerValue,
             selectUserValue: this.state.selectUserValue
         });
-        console.log("state : ", this.state.selectProjectValue, this.state.selectTrackerValue, this.state.selectUserValue)
-        settingToRedmineC(this.props.project, this.state.selectProjectValue, this.state.selectTrackerValue, this.state.selectUserValue);
+        if (this.state.changeProject === true) {
+            settingToRedmineProject(this.props.project, this.state.selectProjectValue);
+            this.setState({
+                changeProject:false
+            })
+        }
+        if (this.state.changeTracker === true) {
+            settingToRedmineTracker(this.props.project, this.state.selectTrackerValue);
+            this.setState({
+                changeTracker:false
+            })
+        }
+        if (this.state.changeUser === true) {
+            settingToRedmineUser(this.props.project, this.state.selectUserValue);
+            this.setState({
+                changeUser:false
+            })
+        }
         this.handleCloseModal();
-
+        window.location.reload();
     }
 
     updateProjectValue(e) {
         console.log("updateProjectValue e: ", e);
         this.setState({
-            selectProjectValue: e
+            selectProjectValue: e,
+            changeProject: true
         })
     };
 
     updateTrackerValue(e) {
         console.log("updateTrackerValue e: ", e);
         this.setState({
-            selectTrackerValue: e
+            selectTrackerValue: e,
+            changeTracker: true
         })
     };
 
     updateUserValue(e) {
         console.log("updateUserValue e: ", e);
         this.setState({
-            selectUserValue: e
+            selectUserValue: e,
+            changeUser: true
         })
     };
 
@@ -95,9 +127,10 @@ export default class SonarIssueList extends React.PureComponent {
 
         saveSettingToRedmine(this.props.project).then(
             (saveData) => {
-                console.log("savaData: ", saveData)
-                console.log("saveData.length", saveData.length)
-                this.setState({});
+                console.log(saveData)
+                this.setState({
+                    saveData: saveData
+                })
             }
         );
 
