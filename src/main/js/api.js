@@ -203,71 +203,80 @@ export function saveSettingToRedmine(project) {
     });
 }
 
-export function IssueToRedmine(key, rule, message) {
-    var issuekey = key;
-    var issuerule = rule;
-    var message = message;
-    axios.get('/api/settings/values?keys=sonar.redmine.hosturl,sonar.redmine.api-access-key,sonar.redmine.project-key,sonar.redmine.tracker-id,sonar.redmine.user-id')
+export function IssueToRedmine(sonar_project, key, rule, message) {
+    let issuekey = key;
+    let issuerule = rule;
+    let issuemessage = message;
+
+    axios.get('/api/settings/values?component=' + sonar_project.key + '&keys=sonar.redmine.hosturl,sonar.redmine.api-access-key,sonar.redmine.project-key,sonar.redmine.tracker-id,sonar.redmine.user-id')
         .then(function (sonarPredmine) {
-            const sonarkeylength = sonarPredmine.data.settings.length;
-            for (let i = 0; i < sonarkeylength; i++) {
-                if (sonarPredmine.data.settings[i].key === 'sonar.redmine.hosturl') {
-                    var url = sonarPredmine.data.settings[i].value;
+                const sonarkeylength = sonarPredmine.data.settings.length;
+                for (let i = 0; i < sonarkeylength; i++) {
+                    if (sonarPredmine.data.settings[i].key === 'sonar.redmine.hosturl') {
+                        var url = sonarPredmine.data.settings[i].value;
+                    }
+                    else if (sonarPredmine.data.settings[i].key === 'sonar.redmine.api-access-key') {
+                        var acc = sonarPredmine.data.settings[i].value;
+                    }
+                    else if (sonarPredmine.data.settings[i].key === 'sonar.redmine.project-key') {
+                        var project = sonarPredmine.data.settings[i].value;
+                    }
+                    else if (sonarPredmine.data.settings[i].key === 'sonar.redmine.tracker-id') {
+                        var tracker = sonarPredmine.data.settings[i].value;
+                    }
+                    else {
+                        var user = sonarPredmine.data.settings[i].value;
+                    }
                 }
-                else if (sonarPredmine.data.settings[i].key === 'sonar.redmine.api-access-key') {
-                    var acc = sonarPredmine.data.settings[i].value;
-                }
-                else if (sonarPredmine.data.settings[i].key === 'sonar.redmine.project-key') {
-                    var project = sonarPredmine.data.settings[i].value;
-                }
-                else if (sonarPredmine.data.settings[i].key === 'sonar.redmine.tracker-id') {
-                    var tracker = sonarPredmine.data.settings[i].value;
-                }
-                else {
-                    var user = sonarPredmine.data.settings[i].value;
-                }
+                axios({
+                    headers: {
+                        'X-Redmine-API-KEY': acc,
+                        'Content-Type': 'application/json'
+                    },
+                    method: 'POST',
+                    url: url + '/issues.json',
+                    transformRequest: [
+                        (data, headers) => {
+                            data = {
+                                "issue": {
+                                    "project_id": project,
+                                    "subject": issuerule,
+                                    "tracker_id": tracker,
+                                    "assigned_to_id": user,
+                                    "description": issuerule + '\n' + issuemessage + '\n\n' + 'check the sonarqube'
+                                }
+                            };
+                            return JSON.stringify(data)
+                        },
+                    ]
+                }).then(function (restRedmine) {
+                    console.log("restRedmine", restRedmine);
+                    if (restRedmine.status === 201 || restRedmine.status===200) {
+                        axios({
+                            method: 'POST',
+                            url: '/api/issues/add_comment',
+                            issue: issuekey,
+                            text: url + '/issues/' + restRedmine.data.id
+                        })
+                    }
+                }).catch(error => {
+                    console.log(error.response)
+                });
             }
-            const PostData={
-                'issue': {
-                    'project-id': project,
-                    'subject': issuerule,
-                    'tracker_id': tracker,
-                    'assigned_to_id': user,
-                    'description': rule + "\n" + message + "\n\n" + "Check it on SonarQube"
-                }
-            };
-            axios({
-                headers: {
-                    'X-Redmine-API-KEY': acc,
-                    'Content-Type': 'application/json'
-                },
-                method: 'POST',
-                url: url + '/issues.json',
-                data:PostData
-            }).then(function (restRedmine) {
-                if (restRedmine.status === 200) {
-                    axios({
-                        method: 'POST',
-                        url: '/api/issues/bulk_change',
-                        issues: issuekey,
-                        comment: url + '/issues/' + restRedmine.data.id
-                    })
-                }
-            });
-        });
+        )
+    ;
 }
 
 export function TFRedmine(issue) {
     return axios({
         method: 'GET',
-        url: '/api/issues/search?issues=' + issue
+        url: '/api/issues/search?issues=' + issue + '&additionalFields=comments'
     }).then(function (TFIssueResponse) {
-        console.log(TFIssueResponse)
         let commentData = {};
-        if (TFIssueResponse.data.issues.comments!==undefined) {
+        if (TFIssueResponse.data.issues.comments !== undefined) {
             commentData = TFIssueResponse.data.issues.comments.htmlText;
         } else {
-            commentData=false;
+            commentData = false;
         }
         return commentData
     })
@@ -279,12 +288,14 @@ export function settingToRedmineProject(project, redmine_projectid) {
         url: '/api/settings/set?component=' + project.key + '&key=sonar.redmine.project-key&value=' + redmine_projectid
     });
 }
+
 export function settingToRedmineTracker(project, redmine_trackerid) {
     axios({
         method: 'POST',
         url: '/api/settings/set?component=' + project.key + '&key=sonar.redmine.tracker-id&value=' + redmine_trackerid
     });
 }
+
 export function settingToRedmineUser(project, redmine_userid) {
     axios({
         method: 'POST',

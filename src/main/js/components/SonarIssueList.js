@@ -187,6 +187,7 @@ export default class SonarIssueList extends React.PureComponent {
                         {this.state.data.map(
                             (issues, idx) =>
                                 <MeasuresHistory
+                                    project={this.props.project}
                                     issue={issues}
                                     key={idx}
                                 />

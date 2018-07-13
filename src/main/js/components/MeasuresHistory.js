@@ -15,13 +15,13 @@ export default class MeasuresHistory extends React.PureComponent {
     }
 
     TFRedmineToSend() {
-        console.log(TFRedmine(this.props.issue.key));
         if (TFRedmine(this.props.issue.key) !== false) {
+            let project=this.props.project;
             let issuekey=this.props.issue.key;
             let rule=this.props.issue.rule;
             let message=this.props.issue.message;
             return (
-                <button onClick={function() {IssueToRedmine(issuekey,rule,message)}}>
+                <button onClick={function() {IssueToRedmine(project,issuekey,rule,message)}}>
                     To_Redmine
                 </button>);
         } else {
