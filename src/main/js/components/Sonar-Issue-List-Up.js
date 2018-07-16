@@ -7,7 +7,7 @@ import React from 'react';
 import ReactTooltip from 'react-tooltip'
 import {IssueToRedmine, TFRedmine} from "../api";
 
-export default class MeasuresHistory extends React.PureComponent {
+export default class SonarIssueListUp extends React.PureComponent {
     constructor(props) {
         super(props);
         this.simplification = this.simplification.bind(this);
@@ -16,6 +16,7 @@ export default class MeasuresHistory extends React.PureComponent {
 
     TFRedmineToSend() {
         if (TFRedmine(this.props.issue.key) !== false) {
+            console.log(TFRedmine(this.props.issue.key));
             let project=this.props.project;
             let issuekey=this.props.issue.key;
             let rule=this.props.issue.rule;

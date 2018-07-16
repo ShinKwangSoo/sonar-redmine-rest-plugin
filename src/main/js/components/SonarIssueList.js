@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import ReactModal from 'react-modal';
-import MeasuresHistory from "./MeasuresHistory";
+import SonarIssueListUp from "./Sonar-Issue-List-Up";
 import RedmineSettings from "./RedmineSettings";
 import {
     findIssueAndToRedmine,
@@ -186,7 +186,7 @@ export default class SonarIssueList extends React.PureComponent {
                         <tbody>
                         {this.state.data.map(
                             (issues, idx) =>
-                                <MeasuresHistory
+                                <SonarIssueListUp
                                     project={this.props.project}
                                     issue={issues}
                                     key={idx}

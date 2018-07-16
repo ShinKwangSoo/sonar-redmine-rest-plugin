@@ -251,20 +251,19 @@ export function IssueToRedmine(sonar_project, key, rule, message) {
                     ]
                 }).then(function (restRedmine) {
                     console.log("restRedmine", restRedmine);
-                    if (restRedmine.status === 201 || restRedmine.status===200) {
+                    if (restRedmine.status === 201 || restRedmine.status === 200) {
                         axios({
                             method: 'POST',
-                            url: '/api/issues/add_comment',
-                            issue: issuekey,
-                            text: url + '/issues/' + restRedmine.data.id
-                        })
+                            url: '/api/issues/add_comment?issue=' + issuekey + '&text=' + url + '/issues/' + restRedmine.data.issue.id
+                        }).then(function (responseCommentData) {
+                            return responseCommentData.status
+                        });
                     }
                 }).catch(error => {
                     console.log(error.response)
                 });
             }
-        )
-    ;
+        );
 }
 
 export function TFRedmine(issue) {
@@ -273,6 +272,9 @@ export function TFRedmine(issue) {
         url: '/api/issues/search?issues=' + issue + '&additionalFields=comments'
     }).then(function (TFIssueResponse) {
         let commentData = {};
+        console.log("TFIssueResponse.data.issues", TFIssueResponse.data.issues[0].comments);
+        console.log("TFIssueResponse.data.issues[0].comments[0].markdown", TFIssueResponse.data.issues[0].comments[0].markdown)
+        console.log("TFIssueResponse.data.issues[0].comments.markdown", TFIssueResponse.data.issues[0].comments.markdown)
         if (TFIssueResponse.data.issues.comments !== undefined) {
             commentData = TFIssueResponse.data.issues.comments.htmlText;
         } else {
