@@ -66,6 +66,7 @@ export default class SonarIssueListUp extends React.PureComponent {
                     commentData: commentData
                 });
                 url = this.state.commentData;
+                console.log("url : ",url)
                 window.open(url)
             });
     }

@@ -43,11 +43,11 @@ export function findIssueAndToRedmine(project) {
 export function findIssueBug(project) {
     return getJSON('/api/issues/search', {
         p: 1,
-        ps: 50,
+        ps: 500,
+        s:"SEVERITY",
         types: "BUG",
         componentKey: project.key
     }).then(function (response) {
-        console.log("Response : ",response)
         var data = [];
         var numberOfIssue = 0;
         const numberOfIssueList = response.issues.length;
@@ -77,7 +77,8 @@ export function findIssueBug(project) {
 export function findIssueVULNERABILITY(project) {
     return getJSON('/api/issues/search', {
         p: 1,
-        ps: 50,
+        ps: 500,
+        s:"SEVERITY",
         types: "VULNERABILITY",
         componentKey: project.key
     }).then(function (response) {
@@ -110,7 +111,8 @@ export function findIssueVULNERABILITY(project) {
 export function findIssueCodeSmell(project) {
     return getJSON('/api/issues/search', {
         p: 1,
-        ps: 50,
+        ps: 500,
+        s:"SEVERITY",
         types: "CODE_SMELL",
         componentKey: project.key
     }).then(function (response) {

@@ -7,9 +7,8 @@ import React from 'react';
 import ReactModal from 'react-modal';
 import SonarIssueListUp from "./Sonar-Issue-List-Up";
 import RedmineSettings from "./RedmineSettings";
-import Tabs, {TabPane} from 'rc-tabs';
-import TabContent from 'rc-tabs/lib/TabContent';
-import ScrollableInkTabBar from 'rc-tabs/lib/ScrollableInkTabBar';
+import {Tabs, TabList, Tab, TabPanel} from 'react-tabs';
+import 'react-tabs/style/react-tabs.css';
 
 
 import {
@@ -168,14 +167,39 @@ export default class SonarIssueList extends React.PureComponent {
         })
     };
 
+    SeverityIssue(SeveritySelect){
+        return (
+            <table className="data zebra">
+            <thead>
+            <tr className="code-components-header">
+                <th className="thin nowrap text-center code-components-cell">Severity</th>
+                <th className="thin nowrap text-right code-components-cell">Component</th>
+                <th className="thin nowrap text-left code-components-cell">Line</th>
+                <th className="thin nowrap text-left code-components-cell">message</th>
+                <th className="thin nowrap text-center">To Redmine</th>
+            </tr>
+            </thead>
+                {
+                    <tbody>
+                    {SeveritySelect.map(
+                        (issues, idx) =>
+                            <SonarIssueListUp
+                                project={this.props.project}
+                                issue={issues}
+                                key={idx}
+                            />
+                    )
+                    }
+                    </tbody>}
+            </table>
+                )
+    }
 
-   render() {
-        var callback = function(key){
-        }
+    render() {
         return (
             <div className="page page-limited">
                 <div>
-                    <button onClick={this.handleOpenModal}>Settings</button>
+                    <button className="page-actions" onClick={this.handleOpenModal}>Settings</button>
                     <ReactModal
                         isOpen={this.state.showModal}
                         style={customStyles}>
@@ -194,39 +218,25 @@ export default class SonarIssueList extends React.PureComponent {
                         <button onClick={this.handleCloseModal}>Close</button>
                     </ReactModal>
                 </div>
-                <Tabs
-                    renderTabBar={() => <ScrollableInkTabBar />}
-                    renderTabContent={() => <TabContent animatedWithMargin/>}
-                    defaultActiveKey="1"
-                    onChange={callback}
-                >
-                    <TabPane tab='tab 1' key="1">
-                        <table className="data zebra">
-                            <thead>
-                            <tr className="code-components-header">
-                                <th className="thin nowrap text-center code-components-cell">Severity</th>
-                                <th className="thin nowrap text-right code-components-cell">Component</th>
-                                <th className="thin nowrap text-left code-components-cell">Line</th>
-                                <th className="thin nowrap text-left code-components-cell">message</th>
-                                <th className="thin nowrap text-center">To Redmine</th>
-                            </tr>
-                            </thead>
-                            {
-                                <tbody>
-                                {this.state.bug_data.map(
-                                    (issues, idx) =>
-                                        <SonarIssueListUp
-                                            project={this.props.project}
-                                            issue={issues}
-                                            key={idx}
-                                        />
-                                )
-                                }
-                                </tbody>}
-                       </table>
-                    </TabPane>
-                </Tabs>
+
+
+                    <Tabs>
+                        <TabList>
+                            <Tab>BUG</Tab>
+                            <Tab>Code Smell</Tab>
+                            <Tab>VULNERABILITY</Tab>
+                        </TabList>
+                        <TabPanel>
+                            {this.SeverityIssue(this.state.bug_data)}
+                        </TabPanel>
+                        <TabPanel>
+                            {this.SeverityIssue(this.state.code_smell_data)}
+                        </TabPanel>
+                        <TabPanel>
+                            {this.SeverityIssue(this.state.vulnerability_data)}
+                        </TabPanel>
+                    </Tabs>
             </div>
-    );
+        );
     }
-    }
+}
