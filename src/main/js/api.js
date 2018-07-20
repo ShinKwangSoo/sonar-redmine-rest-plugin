@@ -40,6 +40,106 @@ export function findIssueAndToRedmine(project) {
     });
 }
 
+export function findIssueBug(project) {
+    return getJSON('/api/issues/search', {
+        p: 1,
+        ps: 50,
+        types: "BUG",
+        componentKey: project.key
+    }).then(function (response) {
+        console.log("Response : ",response)
+        var data = [];
+        var numberOfIssue = 0;
+        const numberOfIssueList = response.issues.length;
+        if (numberOfIssueList > 0) {
+            for (let i = 0; i < numberOfIssueList; i++) {
+                let result = {
+                    key: response.issues[i].key,
+                    rule: "",
+                    severity: "",
+                    component: "",
+                    line: "",
+                    message: "",
+                };
+                result.component = response.issues[i].component;
+                result.line = response.issues[i].line;
+                result.message = response.issues[i].message;
+                result.rule = response.issues[i].rule;
+                result.severity = response.issues[i].severity;
+                data[numberOfIssue] = result;
+                numberOfIssue++;
+            }
+        }
+        return data;
+    });
+}
+
+export function findIssueVULNERABILITY(project) {
+    return getJSON('/api/issues/search', {
+        p: 1,
+        ps: 50,
+        types: "VULNERABILITY",
+        componentKey: project.key
+    }).then(function (response) {
+        var data = [];
+        var numberOfIssue = 0;
+        const numberOfIssueList = response.issues.length;
+        if (numberOfIssueList > 0) {
+            for (let i = 0; i < numberOfIssueList; i++) {
+                let result = {
+                    key: response.issues[i].key,
+                    rule: "",
+                    severity: "",
+                    component: "",
+                    line: "",
+                    message: "",
+                };
+                result.component = response.issues[i].component;
+                result.line = response.issues[i].line;
+                result.message = response.issues[i].message;
+                result.rule = response.issues[i].rule;
+                result.severity = response.issues[i].severity;
+                data[numberOfIssue] = result;
+                numberOfIssue++;
+            }
+        }
+        return data;
+    });
+}
+
+export function findIssueCodeSmell(project) {
+    return getJSON('/api/issues/search', {
+        p: 1,
+        ps: 50,
+        types: "CODE_SMELL",
+        componentKey: project.key
+    }).then(function (response) {
+        var data = [];
+        var numberOfIssue = 0;
+        const numberOfIssueList = response.issues.length;
+        if (numberOfIssueList > 0) {
+            for (let i = 0; i < numberOfIssueList; i++) {
+                let result = {
+                    key: response.issues[i].key,
+                    rule: "",
+                    severity: "",
+                    component: "",
+                    line: "",
+                    message: "",
+                };
+                result.component = response.issues[i].component;
+                result.line = response.issues[i].line;
+                result.message = response.issues[i].message;
+                result.rule = response.issues[i].rule;
+                result.severity = response.issues[i].severity;
+                data[numberOfIssue] = result;
+                numberOfIssue++;
+            }
+        }
+        return data;
+    });
+}
+
 export function RedmineSettingsAPI() {
     var projectData = [];
     var trackerData = [];
@@ -203,11 +303,11 @@ export function saveSettingToRedmine(project) {
     });
 }
 
-export function IssueToRedmine(sonar_project, key, rule, message) {
+export function IssueToRedmine(sonar_project, key, rule, message, hosturl) {
     let issuekey = key;
     let issuerule = rule;
     let issuemessage = message;
-
+    let sonar_host_url = hosturl;
     axios.get('/api/settings/values?component=' + sonar_project.key + '&keys=sonar.redmine.hosturl,sonar.redmine.api-access-key,sonar.redmine.project-key,sonar.redmine.tracker-id,sonar.redmine.user-id')
         .then(function (sonarPredmine) {
                 const sonarkeylength = sonarPredmine.data.settings.length;
@@ -243,14 +343,13 @@ export function IssueToRedmine(sonar_project, key, rule, message) {
                                     "subject": issuerule,
                                     "tracker_id": tracker,
                                     "assigned_to_id": user,
-                                    "description": issuerule + '\n' + issuemessage + '\n\n' + 'check the sonarqube'
+                                    "description": issuerule + '\n' + issuemessage + '\n\n' + 'check the sonarqube <http://' + sonar_host_url + '/project/issues?id=' + sonar_project.key + '&open=' + issuekey + '>'
                                 }
                             };
                             return JSON.stringify(data)
                         },
                     ]
                 }).then(function (restRedmine) {
-                    console.log("restRedmine", restRedmine);
                     if (restRedmine.status === 201 || restRedmine.status === 200) {
                         axios({
                             method: 'POST',
@@ -271,17 +370,14 @@ export function TFRedmine(issue) {
         method: 'GET',
         url: '/api/issues/search?issues=' + issue + '&additionalFields=comments'
     }).then(function (TFIssueResponse) {
-        let commentData = {};
-        console.log("TFIssueResponse.data.issues", TFIssueResponse.data.issues[0].comments);
-        console.log("TFIssueResponse.data.issues[0].comments[0].markdown", TFIssueResponse.data.issues[0].comments[0].markdown)
-        console.log("TFIssueResponse.data.issues[0].comments.markdown", TFIssueResponse.data.issues[0].comments.markdown)
-        if (TFIssueResponse.data.issues.comments !== undefined) {
-            commentData = TFIssueResponse.data.issues.comments.htmlText;
+        let commentData;
+        if (TFIssueResponse.data.issues[0].comments.length !== 0) {
+            commentData = TFIssueResponse.data.issues[0].comments[0].markdown
         } else {
             commentData = false;
         }
         return commentData
-    })
+    });
 }
 
 export function settingToRedmineProject(project, redmine_projectid) {

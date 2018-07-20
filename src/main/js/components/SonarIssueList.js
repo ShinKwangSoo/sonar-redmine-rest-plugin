@@ -7,13 +7,20 @@ import React from 'react';
 import ReactModal from 'react-modal';
 import SonarIssueListUp from "./Sonar-Issue-List-Up";
 import RedmineSettings from "./RedmineSettings";
+import Tabs, {TabPane} from 'rc-tabs';
+import TabContent from 'rc-tabs/lib/TabContent';
+import ScrollableInkTabBar from 'rc-tabs/lib/ScrollableInkTabBar';
+
+
 import {
-    findIssueAndToRedmine,
     RedmineSettingsAPI,
     saveSettingToRedmine,
     settingToRedmineProject,
     settingToRedmineTracker,
-    settingToRedmineUser
+    settingToRedmineUser,
+    findIssueCodeSmell,
+    findIssueBug,
+    findIssueVULNERABILITY
 } from "../api";
 
 const customStyles = {
@@ -31,7 +38,9 @@ export default class SonarIssueList extends React.PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            data: [],
+            bug_data: [],
+            code_smell_data: [],
+            vulnerability_data: [],
             isOpen: false,
             showModal: false,
             settings: [],
@@ -42,6 +51,7 @@ export default class SonarIssueList extends React.PureComponent {
             changeProject: false,
             changeTracker: false,
             changeUser: false,
+            activeKey: ''
         };
         this.handleOpenModal = this.handleOpenModal.bind(this);
         this.handleCloseModal = this.handleCloseModal.bind(this);
@@ -49,6 +59,48 @@ export default class SonarIssueList extends React.PureComponent {
         this.updateProjectValue = this.updateProjectValue.bind(this);
         this.updateTrackerValue = this.updateTrackerValue.bind(this);
         this.updateUserValue = this.updateUserValue.bind(this);
+    }
+
+    componentDidMount() {
+        findIssueBug(this.props.project).then(
+            (valuesReturnedByAPI) => {
+                this.setState({
+                    bug_data: valuesReturnedByAPI
+                });
+            }
+        );
+
+        findIssueCodeSmell(this.props.project).then(
+            (valuesReturnedByAPI) => {
+                this.setState({
+                    code_smell_data: valuesReturnedByAPI
+                });
+            }
+        );
+
+        findIssueVULNERABILITY(this.props.project).then(
+            (valuesReturnedByAPI) => {
+                this.setState({
+                    vulnerability_data: valuesReturnedByAPI
+                });
+            }
+        );
+
+        saveSettingToRedmine(this.props.project).then(
+            (saveData) => {
+                this.setState({
+                    saveData: saveData
+                })
+            }
+        );
+
+        RedmineSettingsAPI().then(
+            (settingData) => {
+                this.setState({
+                    settings: settingData
+                });
+            }
+        );
     }
 
     handleOpenModal() {
@@ -73,19 +125,19 @@ export default class SonarIssueList extends React.PureComponent {
         if (this.state.changeProject === true) {
             settingToRedmineProject(this.props.project, this.state.selectProjectValue);
             this.setState({
-                changeProject:false
+                changeProject: false
             })
         }
         if (this.state.changeTracker === true) {
             settingToRedmineTracker(this.props.project, this.state.selectTrackerValue);
             this.setState({
-                changeTracker:false
+                changeTracker: false
             })
         }
         if (this.state.changeUser === true) {
             settingToRedmineUser(this.props.project, this.state.selectUserValue);
             this.setState({
-                changeUser:false
+                changeUser: false
             })
         }
         this.handleCloseModal();
@@ -116,86 +168,65 @@ export default class SonarIssueList extends React.PureComponent {
         })
     };
 
-    componentDidMount() {
-        findIssueAndToRedmine(this.props.project).then(
-            (valuesReturnedByAPI) => {
-                this.setState({
-                    data: valuesReturnedByAPI
-                });
-            }
-        );
 
-        saveSettingToRedmine(this.props.project).then(
-            (saveData) => {
-                console.log(saveData)
-                this.setState({
-                    saveData: saveData
-                })
-            }
-        );
-
-        RedmineSettingsAPI().then(
-            (settingData) => {
-                this.setState({
-                    settings: settingData
-                });
-            }
-        );
-    }
-
-    render() {
-        // Data Gathered: {JSON.stringify(this.state.data)}
+   render() {
+        var callback = function(key){
+        }
         return (
             <div className="page page-limited">
-                <table className="data zebra">
-                    <thead>
-                    <tr>
+                <div>
+                    <button onClick={this.handleOpenModal}>Settings</button>
+                    <ReactModal
+                        isOpen={this.state.showModal}
+                        style={customStyles}>
                         <div>
-                            <button onClick={this.handleOpenModal}>Settings</button>
-                            <ReactModal
-                                isOpen={this.state.showModal}
-                                style={customStyles}>
-                                <div>
-                                    <RedmineSettings saveData={this.state.saveData}
-                                                     container={this.state.settings}
-                                                     projectDefault={this.state.selectProjectValue}
-                                                     trackerDefault={this.state.selectTrackerValue}
-                                                     userDefault={this.state.selectUserValue}
-                                                     projectValue={this.updateProjectValue}
-                                                     trackerValue={this.updateTrackerValue}
-                                                     userValue={this.updateUserValue}
-                                    />
-                                </div>
-                                <button onClick={this.submitFunction}>Save</button>
-                                <button onClick={this.handleCloseModal}>Close</button>
-                            </ReactModal>
+                            <RedmineSettings saveData={this.state.saveData}
+                                             container={this.state.settings}
+                                             projectDefault={this.state.selectProjectValue}
+                                             trackerDefault={this.state.selectTrackerValue}
+                                             userDefault={this.state.selectUserValue}
+                                             projectValue={this.updateProjectValue}
+                                             trackerValue={this.updateTrackerValue}
+                                             userValue={this.updateUserValue}
+                            />
                         </div>
-                    </tr>
-                    </thead>
-                    <thead>
-                    <tr className="code-components-header">
-                        <th className="thin nowrap text-center code-components-cell">Severity</th>
-                        <th className="thin nowrap text-right code-components-cell">type</th>
-                        <th className="thin nowrap text-right code-components-cell">Component</th>
-                        <th className="thin nowrap text-left code-components-cell">Line</th>
-                        <th className="thin nowrap text-left code-components-cell">message</th>
-                        <th className="thin nowrap text-center">To Redmine</th>
-                    </tr>
-                    </thead>
-                    {
-                        <tbody>
-                        {this.state.data.map(
-                            (issues, idx) =>
-                                <SonarIssueListUp
-                                    project={this.props.project}
-                                    issue={issues}
-                                    key={idx}
-                                />
-                        )
-                        }
-                        </tbody>}
-                </table>
+                        <button onClick={this.submitFunction}>Save</button>
+                        <button onClick={this.handleCloseModal}>Close</button>
+                    </ReactModal>
+                </div>
+                <Tabs
+                    renderTabBar={() => <ScrollableInkTabBar />}
+                    renderTabContent={() => <TabContent animatedWithMargin/>}
+                    defaultActiveKey="1"
+                    onChange={callback}
+                >
+                    <TabPane tab='tab 1' key="1">
+                        <table className="data zebra">
+                            <thead>
+                            <tr className="code-components-header">
+                                <th className="thin nowrap text-center code-components-cell">Severity</th>
+                                <th className="thin nowrap text-right code-components-cell">Component</th>
+                                <th className="thin nowrap text-left code-components-cell">Line</th>
+                                <th className="thin nowrap text-left code-components-cell">message</th>
+                                <th className="thin nowrap text-center">To Redmine</th>
+                            </tr>
+                            </thead>
+                            {
+                                <tbody>
+                                {this.state.bug_data.map(
+                                    (issues, idx) =>
+                                        <SonarIssueListUp
+                                            project={this.props.project}
+                                            issue={issues}
+                                            key={idx}
+                                        />
+                                )
+                                }
+                                </tbody>}
+                       </table>
+                    </TabPane>
+                </Tabs>
             </div>
-        );
+    );
     }
-}
+    }

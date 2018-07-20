@@ -10,42 +10,94 @@ import {IssueToRedmine, TFRedmine} from "../api";
 export default class SonarIssueListUp extends React.PureComponent {
     constructor(props) {
         super(props);
+        this.state = {
+            commentData: false,
+            succeed: true
+        };
         this.simplification = this.simplification.bind(this);
         this.TFRedmineToSend = this.TFRedmineToSend.bind(this);
+        this.Go_Redmine = this.Go_Redmine.bind(this);
+        this.handleClick = this.handleClick.bind(this);
+        this.Go_Redmine_Button = this.Go_Redmine_Button.bind(this);
+    }
+
+    componentDidMount() {
+        TFRedmine(this.props.issue.key).then(
+            (commentData) => {
+                this.setState({commentData: commentData})
+            })
     }
 
     TFRedmineToSend() {
-        if (TFRedmine(this.props.issue.key) !== false) {
-            console.log(TFRedmine(this.props.issue.key));
-            let project=this.props.project;
-            let issuekey=this.props.issue.key;
-            let rule=this.props.issue.rule;
-            let message=this.props.issue.message;
+        if (this.state.commentData === false) {
+            let project = this.props.project;
+            let issuekey = this.props.issue.key;
+            let rule = this.props.issue.rule;
+            let message = this.props.issue.message;
+            let hosturl = window.location.host;
             return (
-                <button onClick={function() {IssueToRedmine(project,issuekey,rule,message)}}>
-                    To_Redmine
-                </button>);
+                <span>
+                <button onClick={function () {
+                    IssueToRedmine(project, issuekey, rule, message, hosturl);
+                }}>To_Redmine
+                </button>
+                </span>
+            );
         } else {
-            return (
-                <button onClick={function(){{window.open("http://naver.com")}}} color={'#194D33'}>
-                    Go_Redmine
-                </button>);
+            this.setState({succeed: false});
+            this.Go_Redmine()
         }
+    }
+
+    handleClick() {
+        this.setState(previousState => {
+            return {
+                succeed: !previousState.succeed
+            };
+        });
+    }
+
+    Go_Redmine_Button() {
+        this.setState({succeed: false});
+        var url;
+        TFRedmine(this.props.issue.key).then(
+            (commentData) => {
+                this.setState({
+                    commentData: commentData
+                });
+                url = this.state.commentData;
+                window.open(url)
+            });
+    }
+
+    Go_Redmine() {
+        return (
+            <span>
+            <button onClick={
+                () => this.Go_Redmine_Button()
+            }>
+                Go_Redmine
+            </button>
+            </span>);
     }
 
     simplification = (line, maxLength) => {
         if (line === null || line.length <= maxLength) return line;
         else return line.substring(0, maxLength)
-    }
+    };
+
 
     render() {
+        const succeed = (
+            this.TFRedmineToSend()
+        );
+        const notsucceed = (
+            this.Go_Redmine()
+        );
         return (
             <tr>
                 <td className="thin nowrap text-center">
                     <div className="code-components-cell"><span>{this.props.issue.severity}</span></div>
-                </td>
-                <td className="thin nowrap text-right">
-                    <div className="code-components-cell"><span>{this.props.issue.type}</span></div>
                 </td>
                 <td className="thin nowrap text-right">
                     <div className="code-components-cell"><span>{this.props.issue.component}</span></div>
@@ -63,13 +115,12 @@ export default class SonarIssueListUp extends React.PureComponent {
                     </div>
                 </td>
                 <td className="thin nowrap text-center">
-                    <div className="code-components-cell">
-                        <span>
-                            {this.TFRedmineToSend()}
-                    </span>
+                    <div className="code-components-cell" onClick={this.handleClick.bind(this)}>
+                        {this.state.succeed ? succeed : notsucceed}
                     </div>
                 </td>
             </tr>
+
         );
     }
 }
