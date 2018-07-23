@@ -6,71 +6,72 @@
 import {getJSON} from 'sonar-request';
 import axios from "axios"; // see https://github.com/SonarSource/sonarqube/blob/master/server/sonar-web/src/main/js/app/utils/exposeLibraries.js
 
-export function findIssueAndToRedmine(project) {
-    return getJSON('/api/issues/search', {
-        p: 1,
-        ps: 50,
-        componentKey: project.key
-    }).then(function (response) {
-        var data = [];
-        var numberOfIssue = 0;
-        const numberOfIssueList = response.issues.length;
-        if (numberOfIssueList > 0) {
-            for (let i = 0; i < numberOfIssueList; i++) {
-                let result = {
-                    key: response.issues[i].key,
-                    rule: "",
-                    severity: "",
-                    component: "",
-                    line: "",
-                    message: "",
-                    type: ""
-                };
-                result.component = response.issues[i].component;
-                result.line = response.issues[i].line;
-                result.message = response.issues[i].message;
-                result.rule = response.issues[i].rule;
-                result.severity = response.issues[i].severity;
-                result.type = response.issues[i].type;
-                data[numberOfIssue] = result;
-                numberOfIssue++;
-            }
-        }
-        return data;
-    });
-}
-
 export function findIssueBug(project) {
     return getJSON('/api/issues/search', {
         p: 1,
         ps: 500,
-        s:"SEVERITY",
+        s: "SEVERITY",
         types: "BUG",
         componentKey: project.key
     }).then(function (response) {
         var data = [];
         var numberOfIssue = 0;
-        const numberOfIssueList = response.issues.length;
-        if (numberOfIssueList > 0) {
-            for (let i = 0; i < numberOfIssueList; i++) {
-                let result = {
-                    key: response.issues[i].key,
-                    rule: "",
-                    severity: "",
-                    component: "",
-                    line: "",
-                    message: "",
-                };
-                result.component = response.issues[i].component;
-                result.line = response.issues[i].line;
-                result.message = response.issues[i].message;
-                result.rule = response.issues[i].rule;
-                result.severity = response.issues[i].severity;
-                data[numberOfIssue] = result;
-                numberOfIssue++;
+        if (response.paging.total < 500) {
+            const numberOfIssueList = response.issues.length;
+            if (numberOfIssueList > 0) {
+                for (let i = 0; i < numberOfIssueList; i++) {
+                    let result = {
+                        key: response.issues[i].key,
+                        rule: "",
+                        severity: "",
+                        component: "",
+                        line: "",
+                        message: "",
+                    };
+                    result.component = response.issues[i].component;
+                    result.line = response.issues[i].line;
+                    result.message = response.issues[i].message;
+                    result.rule = response.issues[i].rule;
+                    result.severity = response.issues[i].severity;
+                    data[numberOfIssue] = result;
+                    numberOfIssue++;
+                }
+            }
+            return data;
+        }
+        else {
+            for (let s = 1; s < Math.ceil(response.paging.total / 500); s++) {
+                return getJSON('/api/issues/search', {
+                    p: s,
+                    ps: 500,
+                    s: "SEVERITY",
+                    types: "BUG",
+                    componentKey: project.key
+                }).then(function (totalresponse) {
+                    const numberOfIssueList = totalresponse.issues.length;
+                    if (numberOfIssueList > 0) {
+                        for (let i = 0; i < numberOfIssueList; i++) {
+                            let result = {
+                                key: totalresponse.issues[i].key,
+                                rule: "",
+                                severity: "",
+                                component: "",
+                                line: "",
+                                message: "",
+                            };
+                            result.component = totalresponse.issues[i].component;
+                            result.line = totalresponse.issues[i].line;
+                            result.message = totalresponse.issues[i].message;
+                            result.rule = totalresponse.issues[i].rule;
+                            result.severity = totalresponse.issues[i].severity;
+                            data[numberOfIssue] = result;
+                            numberOfIssue++;
+                        }
+                    }
+                    return data;
+                })
             }
         }
-        return data;
     });
 }
 
@@ -78,7 +79,7 @@ export function findIssueVULNERABILITY(project) {
     return getJSON('/api/issues/search', {
         p: 1,
         ps: 500,
-        s:"SEVERITY",
+        s: "SEVERITY",
         types: "VULNERABILITY",
         componentKey: project.key
     }).then(function (response) {
@@ -111,34 +112,95 @@ export function findIssueVULNERABILITY(project) {
 export function findIssueCodeSmell(project) {
     return getJSON('/api/issues/search', {
         p: 1,
-        ps: 500,
-        s:"SEVERITY",
+        ps: 20,
+        s: "SEVERITY",
         types: "CODE_SMELL",
         componentKey: project.key
     }).then(function (response) {
         var data = [];
         var numberOfIssue = 0;
-        const numberOfIssueList = response.issues.length;
-        if (numberOfIssueList > 0) {
-            for (let i = 0; i < numberOfIssueList; i++) {
-                let result = {
-                    key: response.issues[i].key,
-                    rule: "",
-                    severity: "",
-                    component: "",
-                    line: "",
-                    message: "",
-                };
-                result.component = response.issues[i].component;
-                result.line = response.issues[i].line;
-                result.message = response.issues[i].message;
-                result.rule = response.issues[i].rule;
-                result.severity = response.issues[i].severity;
-                data[numberOfIssue] = result;
-                numberOfIssue++;
+        if (response.paging.total < 20) {
+            const numberOfIssueList = response.issues.length;
+            if (numberOfIssueList > 0) {
+                for (let i = 0; i < numberOfIssueList; i++) {
+                    let result = {
+                        key: response.issues[i].key,
+                        rule: "",
+                        severity: "",
+                        component: "",
+                        line: "",
+                        message: "",
+                    };
+                    result.component = response.issues[i].component;
+                    result.line = response.issues[i].line;
+                    result.message = response.issues[i].message;
+                    result.rule = response.issues[i].rule;
+                    result.severity = response.issues[i].severity;
+                    data[numberOfIssue] = result;
+                    numberOfIssue++;
+                }
             }
+            return data;
         }
-        return data;
+        else {
+            console.log("Math.ceil(response.paging.total / 20)+1 : ", Math.ceil(response.paging.total / 20) + 1)
+            for (let s = 1; s < Math.ceil(response.paging.total / 20) + 1; s++) {
+                console.log("s : ", s);
+                getJSON('/api/issues/search', {
+                    p: s,
+                    ps: 20,
+                    s: "SEVERITY",
+                    types: "CODE_SMELL",
+                    componentKey: project.key
+                }).then(function (totalresponse) {
+                    console.log("totalresponse", totalresponse);
+                    if (s > 1) {
+                        let index=index+20;
+                        const numberOfIssueList = totalresponse.issues.length;
+                        for (let i = index+1; i < numberOfIssueList.paging.total; i++) {
+                            let result = {
+                                key: totalresponse.issues[i].key,
+                                rule: "",
+                                severity: "",
+                                component: "",
+                                line: "",
+                                message: "",
+                            };
+                            result.component = totalresponse.issues[i].component;
+                            result.line = totalresponse.issues[i].line;
+                            result.message = totalresponse.issues[i].message;
+                            result.rule = totalresponse.issues[i].rule;
+                            result.severity = totalresponse.issues[i].severity;
+                            data[numberOfIssue] = result;
+                            numberOfIssue++;
+                        }
+                    } else {
+                        const numberOfIssueList = totalresponse.issues.length;
+                        if (numberOfIssueList > 0) {
+                            for (let i = 0; i < numberOfIssueList; i++) {
+                                let result = {
+                                    key: totalresponse.issues[i].key,
+                                    rule: "",
+                                    severity: "",
+                                    component: "",
+                                    line: "",
+                                    message: "",
+                                };
+                                result.component = totalresponse.issues[i].component;
+                                result.line = totalresponse.issues[i].line;
+                                result.message = totalresponse.issues[i].message;
+                                result.rule = totalresponse.issues[i].rule;
+                                result.severity = totalresponse.issues[i].severity;
+                                data[numberOfIssue] = result;
+                                numberOfIssue++;
+                            }
+                        }
+                    }
+                })
+            }
+            console.log("20 over data", data)
+            return data;
+        }
     });
 }
 
@@ -305,10 +367,12 @@ export function saveSettingToRedmine(project) {
     });
 }
 
-export function IssueToRedmine(sonar_project, key, rule, message, hosturl) {
-    let issuekey = key;
-    let issuerule = rule;
-    let issuemessage = message;
+export function IssueToRedmine(sonar_project, issue, hosturl) {
+    let issuekey = issue.key;
+    let issuerule = issue.rule;
+    let issuemessage = issue.message;
+    let issuecomponent = issue.component;
+    let issueline = issue.line;
     let sonar_host_url = hosturl;
     axios.get('/api/settings/values?component=' + sonar_project.key + '&keys=sonar.redmine.hosturl,sonar.redmine.api-access-key,sonar.redmine.project-key,sonar.redmine.tracker-id,sonar.redmine.user-id')
         .then(function (sonarPredmine) {
@@ -345,7 +409,7 @@ export function IssueToRedmine(sonar_project, key, rule, message, hosturl) {
                                     "subject": issuerule,
                                     "tracker_id": tracker,
                                     "assigned_to_id": user,
-                                    "description": issuerule + '\n' + issuemessage + '\n\n' + 'check the sonarqube <http://' + sonar_host_url + '/project/issues?id=' + sonar_project.key + '&open=' + issuekey + '>'
+                                    "description": issuerule + '\n' + issuemessage + '\n\n' + '\n\n Source Code location:' + issuecomponent + ' Line : ' + issueline + +'check the sonarqube <http://' + sonar_host_url + '/project/issues?id=' + sonar_project.key + '&open=' + issuekey + '>'
                                 }
                             };
                             return JSON.stringify(data)

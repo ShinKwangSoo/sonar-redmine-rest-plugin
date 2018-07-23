@@ -31,14 +31,12 @@ export default class SonarIssueListUp extends React.PureComponent {
     TFRedmineToSend() {
         if (this.state.commentData === false) {
             let project = this.props.project;
-            let issuekey = this.props.issue.key;
-            let rule = this.props.issue.rule;
-            let message = this.props.issue.message;
+            let issue=this.props.issue
             let hosturl = window.location.host;
             return (
                 <span>
                 <button onClick={function () {
-                    IssueToRedmine(project, issuekey, rule, message, hosturl);
+                    IssueToRedmine(project, issue, hosturl);
                 }}>To_Redmine
                 </button>
                 </span>
