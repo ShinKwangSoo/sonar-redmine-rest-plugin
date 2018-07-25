@@ -3,6 +3,7 @@ import Select from 'react-select';
 
 const labelStyle = {
     width:"150",
+    height:"300",
     minWidth: "100",
 
 };
