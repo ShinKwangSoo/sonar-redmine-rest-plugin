@@ -195,6 +195,14 @@ export default class SonarIssueList extends React.PureComponent {
                 )
     }
 
+    showMoreIssue(e){
+        e.target.value();
+        console.log("e",e);
+        console.log("e.target.value();",e.target.value());
+    }
+
+
+
     render() {
         return (
             <div className="page page-limited">
@@ -236,6 +244,7 @@ export default class SonarIssueList extends React.PureComponent {
                             {this.SeverityIssue(this.state.vulnerability_data)}
                         </TabPanel>
                     </Tabs>
+                <footer onClick={this.showMoreIssue}><a className={}>show more</a></footer>
             </div>
         );
     }

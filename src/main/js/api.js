@@ -9,7 +9,7 @@ import axios from "axios"; // see https://github.com/SonarSource/sonarqube/blob/
 export function findIssueBug(project) {
     return getJSON('/api/issues/search', {
         p: 1,
-        ps: 500,
+        ps: 100,
         s: "SEVERITY",
         asc:false,
         types: "BUG",
@@ -44,7 +44,7 @@ export function findIssueBug(project) {
 export function findIssueVULNERABILITY(project) {
     return getJSON('/api/issues/search', {
         p: 1,
-        ps: 500,
+        ps: 100,
         s: "SEVERITY",
         asc:false,
         types: "VULNERABILITY",
@@ -79,7 +79,7 @@ export function findIssueVULNERABILITY(project) {
 export function findIssueCodeSmell(project) {
     return getJSON('/api/issues/search', {
         p: 1,
-        ps: 500,
+        ps: 100,
         s: "SEVERITY",
         asc:false,
         types: "CODE_SMELL",
@@ -110,6 +110,17 @@ export function findIssueCodeSmell(project) {
         return data;
     });
 }
+
+
+
+
+
+
+
+
+
+
+
 
     /*return getJSON('/api/issues/search', {
         p: 1,

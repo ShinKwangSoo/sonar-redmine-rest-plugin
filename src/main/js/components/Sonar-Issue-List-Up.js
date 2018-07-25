@@ -106,7 +106,7 @@ export default class SonarIssueListUp extends React.PureComponent {
     };
 
     simplificationlast = (line, maxLength) => {
-        if (line === null || 40 <= maxLength) return line;
+        if (line === null || 20 <= maxLength || line.length <= 80) return line;
         else return "..." + line.substring(maxLength)
     };
 
@@ -142,13 +142,13 @@ export default class SonarIssueListUp extends React.PureComponent {
                             style={{
                                 content: {
                                     top: '50%',
-                                    left: '50%',
+                                    left: '90%',
                                     right: '50%',
                                     bottom: 'auto',
                                     marginRight: '-50%',
                                     transform: 'translate(-50%, -50%)',
                                     width: '60%',
-                                    height: '40%',
+                                    height: '50%',
                                     maxWidth: '40rem',
                                     maxHeight: '40rem',
                                 }
@@ -184,7 +184,6 @@ export default class SonarIssueListUp extends React.PureComponent {
                     </div>
                 </td>
             </tr>
-
         );
     }
 }
