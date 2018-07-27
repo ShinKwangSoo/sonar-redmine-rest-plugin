@@ -9,7 +9,7 @@ import SonarIssueListUp from "./Sonar-Issue-List-Up";
 import RedmineSettings from "./RedmineSettings";
 import {Tabs, TabList, Tab, TabPanel} from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
-
+import {RingLoader} from 'react-spinners';
 
 import {
     RedmineSettingsAPI,
@@ -21,17 +21,6 @@ import {
     findIssueBug,
     findIssueVULNERABILITY
 } from "../api";
-
-const customStyles = {
-    content: {
-        top: '50%',
-        left: '50%',
-        right: 'auto',
-        bottom: 'auto',
-        marginRight: '-50%',
-        transform: 'translate(-50%, -50%)'
-    }
-};
 
 export default class SonarIssueList extends React.PureComponent {
     constructor(props) {
@@ -50,7 +39,7 @@ export default class SonarIssueList extends React.PureComponent {
             changeProject: false,
             changeTracker: false,
             changeUser: false,
-            activeKey: ''
+            loading: true
         };
         this.handleOpenModal = this.handleOpenModal.bind(this);
         this.handleCloseModal = this.handleCloseModal.bind(this);
@@ -96,7 +85,8 @@ export default class SonarIssueList extends React.PureComponent {
         RedmineSettingsAPI().then(
             (settingData) => {
                 this.setState({
-                    settings: settingData
+                    settings: settingData,
+                    loading: false
                 });
             }
         );
@@ -167,18 +157,18 @@ export default class SonarIssueList extends React.PureComponent {
         })
     };
 
-    SeverityIssue(SeveritySelect){
+    SeverityIssue(SeveritySelect) {
         return (
             <table className="data zebra">
-            <thead>
-            <tr className="code-components-header">
-                <th className="thin nowrap text-center code-components-cell">Severity</th>
-                <th className="thin nowrap text-right code-components-cell">Component</th>
-                <th className="thin nowrap text-left code-components-cell">Line</th>
-                <th className="thin nowrap text-left code-components-cell">message</th>
-                <th className="thin nowrap text-center">To Redmine</th>
-            </tr>
-            </thead>
+                <thead>
+                <tr className="code-components-header">
+                    <th className="thin nowrap text-center code-components-cell">Severity</th>
+                    <th className="thin nowrap text-right code-components-cell">Component</th>
+                    <th className="thin nowrap text-left code-components-cell">Line</th>
+                    <th className="thin nowrap text-left code-components-cell">message</th>
+                    <th className="thin nowrap text-center">To Redmine</th>
+                </tr>
+                </thead>
                 {
                     <tbody>
                     {SeveritySelect.map(
@@ -192,26 +182,28 @@ export default class SonarIssueList extends React.PureComponent {
                     }
                     </tbody>}
             </table>
-                )
+        )
     }
-
-    showMoreIssue(e){
-        e.target.value();
-        console.log("e",e);
-        console.log("e.target.value();",e.target.value());
-    }
-
-
 
     render() {
         return (
-            <div className="page page-limited">
+            <div className="code-components-cell">
                 <div>
                     <button className="page-actions" onClick={this.handleOpenModal}>Settings</button>
                     <ReactModal
                         isOpen={this.state.showModal}
-                        style={customStyles}>
+                        style={{
+                            content: {
+                                top: '30%',
+                                left: '80%',
+                                right: 'auto',
+                                bottom: 'auto',
+                                marginRight: '-50%',
+                                transform: 'translate(-50%, -50%)'
+                            }
+                        }}>
                         <div>
+
                             <RedmineSettings saveData={this.state.saveData}
                                              container={this.state.settings}
                                              projectDefault={this.state.selectProjectValue}
@@ -226,26 +218,23 @@ export default class SonarIssueList extends React.PureComponent {
                         <button onClick={this.handleCloseModal}>Close</button>
                     </ReactModal>
                 </div>
-
-
-                    <Tabs>
-                        <TabList>
-                            <Tab>BUG</Tab>
-                            <Tab>Code Smell</Tab>
-                            <Tab>VULNERABILITY</Tab>
-                        </TabList>
-                        <TabPanel>
-                            {this.SeverityIssue(this.state.bug_data)}
-                        </TabPanel>
-                        <TabPanel>
-                            {this.SeverityIssue(this.state.code_smell_data)}
-                        </TabPanel>
-                        <TabPanel>
-                            {this.SeverityIssue(this.state.vulnerability_data)}
-                        </TabPanel>
-                    </Tabs>
-                <footer onClick={this.showMoreIssue}><a className={}>show more</a></footer>
+                <Tabs>
+                    <TabList>
+                        <Tab>BUG</Tab>
+                        <Tab>Code Smell</Tab>
+                        <Tab>VULNERABILITY</Tab>
+                    </TabList>
+                    <TabPanel>
+                        {this.SeverityIssue(this.state.bug_data)}
+                    </TabPanel>
+                    <TabPanel>
+                        {this.SeverityIssue(this.state.code_smell_data)}
+                    </TabPanel>
+                    <TabPanel>
+                        {this.SeverityIssue(this.state.vulnerability_data)}
+                    </TabPanel>
+                </Tabs>
             </div>
-        );
+        )
     }
 }

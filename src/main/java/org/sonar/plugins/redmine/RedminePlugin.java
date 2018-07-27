@@ -20,6 +20,7 @@
 package org.sonar.plugins.redmine;
 
 import org.sonar.api.Plugin;
+import org.sonar.plugins.redmine.PostAnalysisTask.SonarqubePostProjectAnalysisTask;
 import org.sonar.plugins.redmine.config.RedmineSettings;
 import org.sonar.plugins.redmine.ui.SonarToRedmine;
 
@@ -28,10 +29,10 @@ public class RedminePlugin implements Plugin {
 
     @Override
     public void define(Context context) {
-
         // settings
         context.addExtensions(RedmineSettings.getProperties());
         // UI
         context.addExtension(SonarToRedmine.class);
+        context.addExtension(SonarqubePostProjectAnalysisTask.class);
     }
 }

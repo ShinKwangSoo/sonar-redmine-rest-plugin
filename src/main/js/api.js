@@ -13,6 +13,7 @@ export function findIssueBug(project) {
         s: "SEVERITY",
         asc:false,
         types: "BUG",
+        resolved: false,
         componentKeys: project.key
     }).then(function (response) {
         var data = [];
@@ -27,12 +28,14 @@ export function findIssueBug(project) {
                     component: "",
                     line: "",
                     message: "",
+                    type:"",
                 };
                 result.component = response.issues[i].component;
                 result.line = response.issues[i].line;
                 result.message = response.issues[i].message;
                 result.rule = response.issues[i].rule;
                 result.severity = response.issues[i].severity;
+                result.type=response.issues[i].type;
                 data[numberOfIssue] = result;
                 numberOfIssue++;
             }
@@ -47,6 +50,7 @@ export function findIssueVULNERABILITY(project) {
         ps: 100,
         s: "SEVERITY",
         asc:false,
+        resolved: false,
         types: "VULNERABILITY",
         componentKeys: project.key
     }).then(function (response) {
@@ -62,12 +66,14 @@ export function findIssueVULNERABILITY(project) {
                     component: "",
                     line: "",
                     message: "",
+                    type:""
                 };
                 result.component = response.issues[i].component;
                 result.line = response.issues[i].line;
                 result.message = response.issues[i].message;
                 result.rule = response.issues[i].rule;
                 result.severity = response.issues[i].severity;
+                result.type=response.issues[i].type;
                 data[numberOfIssue] = result;
                 numberOfIssue++;
             }
@@ -82,6 +88,7 @@ export function findIssueCodeSmell(project) {
         ps: 100,
         s: "SEVERITY",
         asc:false,
+        resolved: false,
         types: "CODE_SMELL",
         componentKeys: project.key
     }).then(function (response) {
@@ -97,12 +104,14 @@ export function findIssueCodeSmell(project) {
                     component: "",
                     line: "",
                     message: "",
+                    type:""
                 };
                 result.component = response.issues[i].component;
                 result.line = response.issues[i].line;
                 result.message = response.issues[i].message;
                 result.rule = response.issues[i].rule;
                 result.severity = response.issues[i].severity;
+                result.type=response.issues[i].type;
                 data[numberOfIssue] = result;
                 numberOfIssue++;
             }
@@ -356,6 +365,8 @@ export function IssueToRedmine(sonar_project, issue, hosturl) {
     let issuemessage = issue.message;
     let issuecomponent = issue.component;
     let issueline = issue.line;
+    let issueseverity=issue.severity;
+    let issuetype=issue.type;
     let sonar_host_url = hosturl;
     getJSON('/api/settings/values?component=' + sonar_project.key + '&keys=sonar.redmine.hosturl,sonar.redmine.api-access-key,sonar.redmine.project-key,sonar.redmine.tracker-id,sonar.redmine.user-id')
         .then(function (sonarPredmine) {
@@ -392,15 +403,15 @@ export function IssueToRedmine(sonar_project, issue, hosturl) {
                                     "subject": issuerule,
                                     "tracker_id": tracker,
                                     "assigned_to_id": user,
-                                    "description": issuerule + '\n' + issuemessage + '\n\n' + '\n\n Source Code location:\n' + issuecomponent + ' Line : ' + issueline + '\n\n' +'check the sonarqube \n<http://' + sonar_host_url + '/project/issues?id=' + sonar_project.key + '&open=' + issuekey + '>'
+                                    "description": issuerule + '\n' + issuemessage + '\n\n' + '\n\n Source Code location:\n' + issuecomponent + ' Line : ' + issueline + '\n\n' +'check the sonarqube \n<'+sonar_host_url+'/project/issues?id=' + sonar_project.key.replace(':','%3A') + '&open=' + issuekey + '&severities='+issueseverity +'&types='+issuetype +'>'
                                 }
                             };
                             return JSON.stringify(data)
                         },
                     ]
                 }).then(function (restRedmine) {
-                    if (restRedmine.status === 201 || restRedmine.status === 200) {
-                        post('/api/issues/add_comment',{issue: issuekey, text: url + '/issues/' + restRedmine.data.issue.id})
+                    if (restRedmine.status === 201) {
+                        post('/api/issues/add_comment',{issue: issuekey, text: url + '/issues/' + restRedmine.data.issue.id});
                     }
                 }).catch(error => {
                     console.log(error.response)
@@ -433,6 +444,24 @@ export function ruleDataRestAPI(rulekey){
     })
 }
 
+export function SonarHostURL(){
+    return getJSON('/api/system/info').then(function(responseSettingData){
+        let contextData=[];
+        const ArraySystem=Object.keys(responseSettingData.Settings).reduce(function(out,key){
+           out.push({
+               key:key,
+               value: responseSettingData.Settings[key]
+           });
+           return out;
+        },[]);
+        for(let i=0; i<ArraySystem.length; i++){
+            if(ArraySystem[i].key=="sonar.web.context"){
+                contextData[0]=ArraySystem[i].value;
+            }
+        }
+        return contextData;
+    })
+}
 
 
 export function settingToRedmineProject(project, redmine_projectid) {

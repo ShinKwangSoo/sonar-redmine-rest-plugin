@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import ReactTooltip from 'react-tooltip'
-import {IssueToRedmine, TFRedmine, ruleDataRestAPI} from "../api";
+import {IssueToRedmine, TFRedmine, ruleDataRestAPI,SonarHostURL} from "../api";
 import ReactModal from 'react-modal';
 
 export default class SonarIssueListUp extends React.PureComponent {
@@ -17,6 +17,7 @@ export default class SonarIssueListUp extends React.PureComponent {
             ruleData: '',
             showModalMessage: false,
             isOpenMessage: false,
+            context:''
         };
         this.simplification = this.simplification.bind(this);
         this.TFRedmineToSend = this.TFRedmineToSend.bind(this);
@@ -32,13 +33,26 @@ export default class SonarIssueListUp extends React.PureComponent {
             (commentData) => {
                 this.setState({commentData: commentData})
             })
+        SonarHostURL().then(
+            (hostURL) => {
+                this.setState({
+                    context:hostURL
+                })
+            })
     }
+
 
     TFRedmineToSend() {
         if (this.state.commentData === false) {
             let project = this.props.project;
             let issue = this.props.issue;
-            let hosturl = window.location.host;
+            let context=this.state.context;
+            let hosturl='';
+            if(context[0]===undefined){
+                hosturl=window.location.protocol+'//'+window.location.host;
+            }else {
+                hosturl=window.location.protocol+'//'+window.location.host+context[0];
+            }
             return (
                 <span>
                 <button onClick={function () {
@@ -84,7 +98,6 @@ export default class SonarIssueListUp extends React.PureComponent {
                     commentData: commentData
                 });
                 url = this.state.commentData;
-                console.log("url : ", url)
                 window.open(url)
             });
     }
@@ -106,7 +119,7 @@ export default class SonarIssueListUp extends React.PureComponent {
     };
 
     simplificationlast = (line, maxLength) => {
-        if (line === null || 20 <= maxLength || line.length <= 80) return line;
+        if (line === null || line.length <= 60) return line;
         else return "..." + line.substring(maxLength)
     };
 
@@ -136,7 +149,7 @@ export default class SonarIssueListUp extends React.PureComponent {
                 <td className="thin nowrap text-left">
                     <div>
                         <span><a href='#'
-                                 onClick={() => this.handleOpenModalMessage(this.props.issue.rule)}>{this.simplification(this.props.issue.message, 30)}</a></span>
+                                 onClick={event => {event.preventDefault(); this.handleOpenModalMessage(this.props.issue.rule)}}>{this.simplification(this.props.issue.message, 30)}</a></span>
                         <ReactModal
                             isOpen={this.state.showModalMessage}
                             style={{

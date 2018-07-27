@@ -24,7 +24,8 @@ import org.sonar.api.PropertyType;
 import org.sonar.api.config.Configuration;
 import org.sonar.api.config.PropertyDefinition;
 import org.sonar.api.resources.Qualifiers;
-
+import org.sonar.api.rule.Severity;
+import org.sonar.api.rules.RuleType;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -33,8 +34,10 @@ public class RedmineSettings {
 
     public static final String API_KEY = "sonar.redmine.api-access-key";
     public static final String REDMINE_URL = "sonar.redmine.hosturl";
+    public static final String AUTO_REGIST = "sonar.redmine.auto_regist";
+    public static final String AUTO_SEVERITY = "sonar.redmine.auto_severity";
+    public static final String AUTO_TYPE = "sonar.redmine.auto_type";
     public static final String PROJECT_KEY = "sonar.redmine.project-key";
-    public static final String PRIORITY_ID = "sonar.redmine.priority-id";
     public static final String USER_ID = "sonar.redmine.user-id";
     public static final String TRACKER_ID = "sonar.redmine.tracker-id";
     public static final String CATEGORY = "Sonar Redmine Plugin";
@@ -58,6 +61,29 @@ public class RedmineSettings {
                         .description("Example: http://demo.redmine.org/")
                         .category(CATEGORY)
                         .defaultValue("")
+                        .build()),
+                (PropertyDefinition.builder(AUTO_REGIST)
+                        .name("AUTO_REGIST")
+                        .description("When the SonarScanner is finished, it automatically registers the job.")
+                        .type(PropertyType.BOOLEAN)
+                        .category(CATEGORY)
+                        .onlyOnQualifiers(Qualifiers.PROJECT)
+                        .build()),
+                (PropertyDefinition.builder(AUTO_SEVERITY)
+                        .name("AUTO_SEVERITY")
+                        .description("Severity to register automatically. Automatically registers more than the selected severity.")
+                        .type(PropertyType.SINGLE_SELECT_LIST)
+                        .options(Severity.BLOCKER,Severity.CRITICAL,Severity.MAJOR,Severity.MINOR,Severity.INFO)
+                        .category(CATEGORY)
+                        .onlyOnQualifiers(Qualifiers.PROJECT)
+                        .build()),
+                (PropertyDefinition.builder(AUTO_TYPE)
+                        .name("AUTO_TYPE")
+                        .description("Type to register automatically.")
+                        .type(PropertyType.)
+                        .options(Severity.BLOCKER,Severity.CRITICAL,Severity.MAJOR,Severity.MINOR,Severity.INFO)
+                        .category(CATEGORY)
+                        .onlyOnQualifiers(Qualifiers.PROJECT)
                         .build()),
                 (PropertyDefinition.builder(PROJECT_KEY)
                         .name("PROJECT_KEY")
