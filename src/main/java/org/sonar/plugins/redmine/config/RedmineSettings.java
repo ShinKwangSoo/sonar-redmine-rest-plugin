@@ -25,10 +25,11 @@ import org.sonar.api.config.Configuration;
 import org.sonar.api.config.PropertyDefinition;
 import org.sonar.api.resources.Qualifiers;
 import org.sonar.api.rule.Severity;
-import org.sonar.api.rules.RuleType;
+
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static org.sonar.api.rules.RuleType.*;
 
 public class RedmineSettings {
 
@@ -41,6 +42,9 @@ public class RedmineSettings {
     public static final String USER_ID = "sonar.redmine.user-id";
     public static final String TRACKER_ID = "sonar.redmine.tracker-id";
     public static final String CATEGORY = "Sonar Redmine Plugin";
+ /*   private static final String BUG = "BUG";
+    private static final String CODE_SMELL = "CODE_SMELL";
+    private static final String VULNERABILITY = "VULNERABILITY";*/
     private final Configuration settings;
 
     public RedmineSettings(Configuration settings) {
@@ -66,6 +70,16 @@ public class RedmineSettings {
                         .name("AUTO_REGIST")
                         .description("When the SonarScanner is finished, it automatically registers the job.")
                         .type(PropertyType.BOOLEAN)
+                        .defaultValue(String.valueOf(false))
+                        .category(CATEGORY)
+                        .onlyOnQualifiers(Qualifiers.PROJECT)
+                        .build()),
+                (PropertyDefinition.builder(AUTO_TYPE)
+                        .name("AUTO_TYPE")
+                        .description("Type to register automatically.")
+                        .type(PropertyType.TEXT)
+                        .options(BUG.toString(),CODE_SMELL.toString(),VULNERABILITY.toString())
+                        .defaultValue(BUG.toString())
                         .category(CATEGORY)
                         .onlyOnQualifiers(Qualifiers.PROJECT)
                         .build()),
@@ -74,14 +88,7 @@ public class RedmineSettings {
                         .description("Severity to register automatically. Automatically registers more than the selected severity.")
                         .type(PropertyType.SINGLE_SELECT_LIST)
                         .options(Severity.BLOCKER,Severity.CRITICAL,Severity.MAJOR,Severity.MINOR,Severity.INFO)
-                        .category(CATEGORY)
-                        .onlyOnQualifiers(Qualifiers.PROJECT)
-                        .build()),
-                (PropertyDefinition.builder(AUTO_TYPE)
-                        .name("AUTO_TYPE")
-                        .description("Type to register automatically.")
-                        .type(PropertyType.)
-                        .options(Severity.BLOCKER,Severity.CRITICAL,Severity.MAJOR,Severity.MINOR,Severity.INFO)
+                        .defaultValue(Severity.BLOCKER)
                         .category(CATEGORY)
                         .onlyOnQualifiers(Qualifiers.PROJECT)
                         .build()),

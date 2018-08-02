@@ -31,6 +31,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.sonarsource.sonarqube</groupId>
+            <artifactId>sonar-ws</artifactId>
+            <version>${sonar.apiVersion}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <!-- packaged with the plugin -->
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
