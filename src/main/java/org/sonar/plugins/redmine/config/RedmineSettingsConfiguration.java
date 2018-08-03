@@ -4,9 +4,8 @@ import org.sonar.api.CoreProperties;
 import org.sonar.api.batch.InstantiationStrategy;
 import org.sonar.api.batch.ScannerSide;
 import org.sonar.api.config.Configuration;
-import org.sonar.api.rule.Severity;
-import org.sonar.api.rules.RuleType;
 import org.sonar.api.utils.System2;
+import org.sonar.plugins.redmine.model.SeverityStatus;
 
 import javax.annotation.CheckForNull;
 
@@ -46,12 +45,23 @@ public class RedmineSettingsConfiguration {
         return configuration.getBoolean(RedmineSettings.AUTO_REGIST).orElse(false);
     }
 
-    public String Auto_Type() {
-        return configuration.get(RedmineSettings.AUTO_TYPE).orElse(String.valueOf(RuleType.BUG));
+    public boolean Bug() {
+        return configuration.getBoolean(RedmineSettings.BUG).orElse(true);
     }
 
-    public String Auto_Severity() {
-        return configuration.get(RedmineSettings.AUTO_SEVERITY).orElse(Severity.BLOCKER);
+    public boolean Code_Smell() {
+        return configuration.getBoolean(RedmineSettings.CODE_SMELL).orElse(false);
+    }
+
+    public boolean VULNERABILITY() {
+        return configuration.getBoolean(RedmineSettings.VULNERABILITY).orElse(false);
+    }
+
+    public String AUTO_SEVERITY(){
+        return SeverityStatus.of(configuration.get(RedmineSettings.AUTO_SEVERITY).orElse(SeverityStatus.BLOCKER.getSeverityLabel()));
+    }
+    public int AUTO_SEVERITY_LEVEL(String SeverityLabel){
+        return SeverityStatus.to(SeverityLabel);
     }
 
     @CheckForNull

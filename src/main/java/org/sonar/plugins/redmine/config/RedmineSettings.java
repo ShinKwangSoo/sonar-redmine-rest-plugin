@@ -24,12 +24,11 @@ import org.sonar.api.PropertyType;
 import org.sonar.api.config.Configuration;
 import org.sonar.api.config.PropertyDefinition;
 import org.sonar.api.resources.Qualifiers;
-import org.sonar.api.rule.Severity;
+import org.sonar.plugins.redmine.model.SeverityStatus;
 
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static org.sonar.api.rules.RuleType.*;
 
 public class RedmineSettings {
 
@@ -37,14 +36,14 @@ public class RedmineSettings {
     public static final String REDMINE_URL = "sonar.redmine.hosturl";
     public static final String AUTO_REGIST = "sonar.redmine.auto_regist";
     public static final String AUTO_SEVERITY = "sonar.redmine.auto_severity";
-    public static final String AUTO_TYPE = "sonar.redmine.auto_type";
+    public static final String AUTO_TYPE = "Auto Regist Rule Types";
     public static final String PROJECT_KEY = "sonar.redmine.project-key";
     public static final String USER_ID = "sonar.redmine.user-id";
     public static final String TRACKER_ID = "sonar.redmine.tracker-id";
     public static final String CATEGORY = "Sonar Redmine Plugin";
- /*   private static final String BUG = "BUG";
-    private static final String CODE_SMELL = "CODE_SMELL";
-    private static final String VULNERABILITY = "VULNERABILITY";*/
+    public static final String BUG="sonar.redmine.ruleTypes.bugs";
+    public static final String CODE_SMELL="sonar.redmine.ruleTypes.code_smell";
+    public static final String VULNERABILITY="sonar.redmine.ruleTypes.vulnerability";
     private final Configuration settings;
 
     public RedmineSettings(Configuration settings) {
@@ -74,21 +73,39 @@ public class RedmineSettings {
                         .category(CATEGORY)
                         .onlyOnQualifiers(Qualifiers.PROJECT)
                         .build()),
-                (PropertyDefinition.builder(AUTO_TYPE)
-                        .name("AUTO_TYPE")
+                (PropertyDefinition.builder(BUG)
+                        .name("BUG")
                         .description("Type to register automatically.")
-                        .type(PropertyType.TEXT)
-                        .options(BUG.toString(),CODE_SMELL.toString(),VULNERABILITY.toString())
-                        .defaultValue(BUG.toString())
+                        .type(PropertyType.BOOLEAN)
+                        .defaultValue(String.valueOf(true))
                         .category(CATEGORY)
+                        .subCategory(AUTO_TYPE)
+                        .onlyOnQualifiers(Qualifiers.PROJECT)
+                        .build()),
+                (PropertyDefinition.builder(CODE_SMELL)
+                        .name("BUG")
+                        .description("Type to register automatically.")
+                        .type(PropertyType.BOOLEAN)
+                        .defaultValue(String.valueOf(false))
+                        .category(CATEGORY)
+                        .subCategory(AUTO_TYPE)
+                        .onlyOnQualifiers(Qualifiers.PROJECT)
+                        .build()),
+                (PropertyDefinition.builder(VULNERABILITY)
+                        .name("BUG")
+                        .description("Type to register automatically.")
+                        .type(PropertyType.BOOLEAN)
+                        .defaultValue(String.valueOf(false))
+                        .category(CATEGORY)
+                        .subCategory(AUTO_TYPE)
                         .onlyOnQualifiers(Qualifiers.PROJECT)
                         .build()),
                 (PropertyDefinition.builder(AUTO_SEVERITY)
                         .name("AUTO_SEVERITY")
                         .description("Severity to register automatically. Automatically registers more than the selected severity.")
                         .type(PropertyType.SINGLE_SELECT_LIST)
-                        .options(Severity.BLOCKER,Severity.CRITICAL,Severity.MAJOR,Severity.MINOR,Severity.INFO)
-                        .defaultValue(Severity.BLOCKER)
+                        .options(SeverityStatus.BLOCKER.getSeverityLabel(),SeverityStatus.CRITICAL.getSeverityLabel(),SeverityStatus.MIJOR.getSeverityLabel(),SeverityStatus.MINOR.getSeverityLabel(),SeverityStatus.INFO.getSeverityLabel())
+                        .defaultValue(SeverityStatus.BLOCKER.getSeverityLabel())
                         .category(CATEGORY)
                         .onlyOnQualifiers(Qualifiers.PROJECT)
                         .build()),
