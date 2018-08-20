@@ -6,11 +6,6 @@ import org.sonar.api.batch.postjob.PostJobContext;
 import org.sonar.api.batch.postjob.PostJobDescriptor;
 import org.sonar.api.batch.postjob.issue.PostJobIssue;
 import org.sonar.plugins.redmine.config.RedmineSettingsConfiguration;
-import org.sonarqube.ws.Issues;
-import org.sonarqube.ws.client.HttpConnector;
-import org.sonarqube.ws.client.WsClient;
-import org.sonarqube.ws.client.WsClientFactories;
-import org.sonarqube.ws.client.issue.SearchWsRequest;
 
 public class SonarqubeIssueInScannerPostJob implements PostJob {
 
@@ -38,10 +33,9 @@ public class SonarqubeIssueInScannerPostJob implements PostJob {
                         if (issue.severity().toString() == redmineSettingsConfiguration.AUTO_SEVERITY()) {
                             String severity = issue.severity().toString();
                         }
-                        HttpConnector httpConnector = HttpConnector.newBuilder().url(redmineSettingsConfiguration.baseUrl()).credentials("admin", "admin").token("your_token").build();
-                        WsClient wsClient = WsClientFactories.getDefault().newClient(httpConnector);
-                        SearchWsRequest searchWsRequest = new SearchWsRequest();
-                        Issues.SearchWsResponse response = wsClient.issues().search(searchWsRequest);
+                        if(redmineSettingsConfiguration.RedmineURL()!=null && redmineSettingsConfiguration.APIKey()!=null && redmineSettingsConfiguration.ProjectKey()!=null && redmineSettingsConfiguration.TrackerId()!=null && redmineSettingsConfiguration.UserId()!=null) {
+
+                        }
                     }
                 }
             }
