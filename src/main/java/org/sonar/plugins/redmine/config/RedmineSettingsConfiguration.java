@@ -4,7 +4,6 @@ import org.sonar.api.CoreProperties;
 import org.sonar.api.batch.InstantiationStrategy;
 import org.sonar.api.batch.ScannerSide;
 import org.sonar.api.config.Configuration;
-import org.sonar.api.utils.System2;
 import org.sonar.plugins.redmine.model.SeverityStatus;
 
 import javax.annotation.CheckForNull;
@@ -13,13 +12,11 @@ import javax.annotation.CheckForNull;
 @ScannerSide
 public class RedmineSettingsConfiguration {
     private final Configuration configuration;
-    private final System2 system2;
     private final String baseUrl;
 
-    public RedmineSettingsConfiguration(Configuration configuration, System2 system2, String baseUrl) {
+    public RedmineSettingsConfiguration(Configuration configuration) {
         super();
         this.configuration = configuration;
-        this.system2 = system2;
 
         String tempBaseUrl = configuration.hasKey(CoreProperties.SERVER_BASE_URL) ? configuration.get(CoreProperties.SERVER_BASE_URL).orElse(null) : configuration.get("sonar.host.url").orElse(null);
         if (tempBaseUrl == null) {

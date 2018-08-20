@@ -30,14 +30,7 @@ public enum SeverityStatus{
         }
         return BLOCKER.SeverityLevel;
     }
-
-
-
-
-    public int getSeverityLevel(){
-        return SeverityLevel;
-    }
-    public String getSeverityLabel(){
+     public String getSeverityLabel(){
         return SeverityLabel;
     }
 }

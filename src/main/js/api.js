@@ -120,17 +120,6 @@ export function findIssueCodeSmell(project) {
     });
 }
 
-
-
-
-
-
-
-
-
-
-
-
     /*return getJSON('/api/issues/search', {
         p: 1,
         ps: 500,
