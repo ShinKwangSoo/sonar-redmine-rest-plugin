@@ -10,20 +10,24 @@ import org.sonar.api.batch.postjob.PostJob;
 import org.sonar.api.batch.postjob.PostJobContext;
 import org.sonar.api.batch.postjob.PostJobDescriptor;
 import org.sonar.api.batch.postjob.issue.PostJobIssue;
+import org.sonar.api.config.Configuration;
 import org.sonar.plugins.redmine.config.RedmineSettingsConfiguration;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Objects;
+import org.sonar.api.utils.log.Logger;
+import org.sonar.api.utils.log.Loggers;
 
 public class SonarqubeIssueInScannerPostJob implements PostJob {
 
-    private final RedmineSettingsConfiguration redmineSettingsConfiguration;
+    private static final Logger LOGGER = Loggers.get(SonarqubeIssueInScannerPostJob.class);
+    private RedmineSettingsConfiguration redmineSettingsConfiguration;
 
-    public SonarqubeIssueInScannerPostJob(RedmineSettingsConfiguration redmineSettingsConfiguration) {
+    public SonarqubeIssueInScannerPostJob(Configuration configuration) {
+        RedmineSettingsConfiguration redmineSettingsConfiguration = new RedmineSettingsConfiguration(configuration);
         this.redmineSettingsConfiguration = redmineSettingsConfiguration;
     }
 
-    @ParametersAreNonnullByDefault
+    @Override
     public void describe(PostJobDescriptor descriptor) {
         descriptor.name("Send Redmine");
     }
@@ -31,10 +35,9 @@ public class SonarqubeIssueInScannerPostJob implements PostJob {
     private RedmineManager mgr = null;
 
     @Override
-    @ParametersAreNonnullByDefault
     public void execute(PostJobContext context) {
-        if (redmineSettingsConfiguration.Auto_regist()) {
-            if (context.analysisMode().isIssues()) {
+        if (context.analysisMode().isIssues()) {
+            if (redmineSettingsConfiguration.Auto_regist()) {
                 for (PostJobIssue issue : context.issues()) {
                     if (redmineSettingsConfiguration.Bug()) {
                         connectRedmineIssue(issue);
@@ -61,6 +64,7 @@ public class SonarqubeIssueInScannerPostJob implements PostJob {
             if (issue.severity().toString().equals(redmineSettingsConfiguration.AUTO_SEVERITY())) {
                 severity = issue.severity().toString();
             }
+            LOGGER.debug("OPEN {} : {}({})", ruleKey, issue.componentKey(), line);
             if (redmineSettingsConfiguration.RedmineURL() != null && redmineSettingsConfiguration.APIKey() != null && redmineSettingsConfiguration.ProjectKey() != null && redmineSettingsConfiguration.TrackerId() != null && redmineSettingsConfiguration.UserId() != null) {
                 mgr = RedmineManagerFactory.createWithApiKey(Objects.requireNonNull(redmineSettingsConfiguration.RedmineURL()), redmineSettingsConfiguration.APIKey());
                 IssueManager issueMgr = mgr.getIssueManager();

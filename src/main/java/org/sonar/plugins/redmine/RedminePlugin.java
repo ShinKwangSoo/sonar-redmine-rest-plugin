@@ -22,6 +22,7 @@ package org.sonar.plugins.redmine;
 import org.sonar.api.Plugin;
 import org.sonar.plugins.redmine.computerEngine.SonarqubeIssueInScannerPostJob;
 import org.sonar.plugins.redmine.config.RedmineSettings;
+import org.sonar.plugins.redmine.model.SeverityStatus;
 import org.sonar.plugins.redmine.ui.SonarToRedmine;
 
 
@@ -34,5 +35,6 @@ public class RedminePlugin implements Plugin {
         // UI
         context.addExtension(SonarToRedmine.class);
         context.addExtension(SonarqubeIssueInScannerPostJob.class);
+        context.addExtension(SeverityStatus.class);
     }
 }

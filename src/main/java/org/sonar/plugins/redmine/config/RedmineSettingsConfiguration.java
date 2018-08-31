@@ -15,7 +15,6 @@ public class RedmineSettingsConfiguration {
     private final String baseUrl;
 
     public RedmineSettingsConfiguration(Configuration configuration) {
-        super();
         this.configuration = configuration;
 
         String tempBaseUrl = configuration.hasKey(CoreProperties.SERVER_BASE_URL) ? configuration.get(CoreProperties.SERVER_BASE_URL).orElse(null) : configuration.get("sonar.host.url").orElse(null);

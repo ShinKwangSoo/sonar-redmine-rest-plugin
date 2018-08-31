@@ -83,7 +83,7 @@ public class RedmineSettings {
                         .onlyOnQualifiers(Qualifiers.PROJECT)
                         .build()),
                 (PropertyDefinition.builder(CODE_SMELL)
-                        .name("BUG")
+                        .name("CODE_SMELL")
                         .description("Type to register automatically.")
                         .type(PropertyType.BOOLEAN)
                         .defaultValue(String.valueOf(false))
@@ -92,7 +92,7 @@ public class RedmineSettings {
                         .onlyOnQualifiers(Qualifiers.PROJECT)
                         .build()),
                 (PropertyDefinition.builder(VULNERABILITY)
-                        .name("BUG")
+                        .name("VULNERABILITY")
                         .description("Type to register automatically.")
                         .type(PropertyType.BOOLEAN)
                         .defaultValue(String.valueOf(false))

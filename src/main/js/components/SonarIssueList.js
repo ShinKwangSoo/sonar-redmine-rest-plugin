@@ -9,7 +9,6 @@ import SonarIssueListUp from "./Sonar-Issue-List-Up";
 import RedmineSettings from "./RedmineSettings";
 import {Tabs, TabList, Tab, TabPanel} from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
-import {RingLoader} from 'react-spinners';
 
 import {
     RedmineSettingsAPI,
