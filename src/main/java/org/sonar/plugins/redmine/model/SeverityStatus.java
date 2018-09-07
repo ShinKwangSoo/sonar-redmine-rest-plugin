@@ -2,15 +2,15 @@ package org.sonar.plugins.redmine.model;
 
 import org.sonar.api.rule.Severity;
 
-public enum SeverityStatus{
-    BLOCKER(1, Severity.BLOCKER),CRITICAL(2,Severity.CRITICAL),MIJOR(3,Severity.MAJOR),MINOR(4,Severity.MINOR),INFO(5,Severity.INFO);
+public enum SeverityStatus {
+    BLOCKER(1, Severity.BLOCKER), CRITICAL(2, Severity.CRITICAL), MIJOR(3, Severity.MAJOR), MINOR(4, Severity.MINOR), INFO(5, Severity.INFO);
 
     private final int SeverityLevel;
     private final String SeverityLabel;
 
     SeverityStatus(int SeverityLevel, String SeverityLabel) {
-        this.SeverityLevel=SeverityLevel;
-        this.SeverityLabel=SeverityLabel;
+        this.SeverityLevel = SeverityLevel;
+        this.SeverityLabel = SeverityLabel;
     }
 
     public static String of(String SeverityLabel) {
@@ -30,7 +30,12 @@ public enum SeverityStatus{
         }
         return BLOCKER.SeverityLevel;
     }
-     public String getSeverityLabel(){
+
+    public String getSeverityLabel() {
         return SeverityLabel;
+    }
+
+    public int getSeverityLevel() {
+        return SeverityLevel;
     }
 }

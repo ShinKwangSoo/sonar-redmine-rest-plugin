@@ -11,26 +11,21 @@ import org.sonar.api.batch.postjob.PostJobContext;
 import org.sonar.api.batch.postjob.PostJobDescriptor;
 import org.sonar.api.batch.postjob.issue.PostJobIssue;
 import org.sonar.api.config.Configuration;
-import org.sonar.api.rules.RuleType;
-import org.sonar.plugins.redmine.SonarCommentRegist;
-import org.sonar.plugins.redmine.config.RedmineSettingsConfiguration;
-import java.util.Objects;
-
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
+import org.sonar.plugins.redmine.config.RedmineSettingsConfiguration;
+
+import java.util.Objects;
 
 public class SonarqubeIssueInScannerPostJob implements PostJob {
 
     private static final Logger LOGGER = Loggers.get(SonarqubeIssueInScannerPostJob.class);
     private RedmineSettingsConfiguration redmineSettingsConfiguration;
-    private SonarCommentRegist sonarCommentRegist;
 
     public SonarqubeIssueInScannerPostJob(Configuration configuration) {
         RedmineSettingsConfiguration redmineSettingsConfiguration = new RedmineSettingsConfiguration(configuration);
         this.redmineSettingsConfiguration = redmineSettingsConfiguration;
-        SonarCommentRegist sonarCommentRegist=new SonarCommentRegist();
-        this.sonarCommentRegist=sonarCommentRegist;
-    }
+       }
 
     @Override
     public void describe(PostJobDescriptor descriptor) {
@@ -45,19 +40,13 @@ public class SonarqubeIssueInScannerPostJob implements PostJob {
             if (redmineSettingsConfiguration.Auto_regist()) {
                 for (PostJobIssue issue : context.issues()) {
                     if (redmineSettingsConfiguration.Bug()) {
-                        if (RuleType.BUG.toString().equals(redmineSettingsConfiguration.Bug())) {
-                            connectRedmineIssue(issue);
-                        }
+                        connectRedmineIssue(issue);
                     }
                     if (redmineSettingsConfiguration.Code_Smell()) {
-                        if (RuleType.CODE_SMELL.toString().equals(redmineSettingsConfiguration.Code_Smell())) {
-                            connectRedmineIssue(issue);
-                        }
+                        connectRedmineIssue(issue);
                     }
                     if (redmineSettingsConfiguration.VULNERABILITY()) {
-                        if (RuleType.VULNERABILITY.toString().equals(redmineSettingsConfiguration.VULNERABILITY())) {
-                            connectRedmineIssue(issue);
-                        }
+                        connectRedmineIssue(issue);
                     }
                 }
             }
@@ -65,8 +54,26 @@ public class SonarqubeIssueInScannerPostJob implements PostJob {
     }
 
     private void connectRedmineIssue(PostJobIssue issue) {
-        LOGGER.debug("AUTO_SEVERITY_LEVEL", redmineSettingsConfiguration.AUTO_SEVERITY_LEVEL(redmineSettingsConfiguration.AUTO_SEVERITY()));
-        for (int i = 0; i < redmineSettingsConfiguration.AUTO_SEVERITY_LEVEL(redmineSettingsConfiguration.AUTO_SEVERITY()); i++) {
+        LOGGER.debug("AUTO_SEVERITY_LABLE {} {}", redmineSettingsConfiguration.AUTO_SEVERITY(),redmineSettingsConfiguration.AUTO_SEVERITY_LEVEL(redmineSettingsConfiguration.AUTO_SEVERITY()));
+        int level=1;
+        switch (redmineSettingsConfiguration.AUTO_SEVERITY()) {
+            case "BLOCK":
+                level = 1;
+                break;
+            case "CRITICAL":
+                level = 2;
+                break;
+            case "MAJOR":
+                level = 3;
+                break;
+            case "MINOR":
+                level = 4;
+                break;
+            case "INFO":
+                level = 5;
+                break;
+        }
+        for (int i = 0; i < level; i++){
             if (issue.severity().toString().equals(redmineSettingsConfiguration.AUTO_SEVERITY())) {
                 String key = issue.key();
                 String ruleKey = issue.ruleKey().toString();
@@ -74,7 +81,8 @@ public class SonarqubeIssueInScannerPostJob implements PostJob {
                 Integer line = issue.line();
                 String message = issue.message();
                 String severity = issue.severity().toString();
-                LOGGER.debug("OPEN {} : {}({})", ruleKey, issue.componentKey(), line);
+                LOGGER.debug("OPEN {} {}",key,issue.ruleKey().repository());
+                LOGGER.debug("OPEN {} : {}({}), Full: {}", ruleKey, issue.componentKey(), line, issue);
                 if (redmineSettingsConfiguration.RedmineURL() != null && redmineSettingsConfiguration.APIKey() != null && redmineSettingsConfiguration.ProjectKey() != null && redmineSettingsConfiguration.TrackerId() != null && redmineSettingsConfiguration.UserId() != null) {
                     mgr = RedmineManagerFactory.createWithApiKey(Objects.requireNonNull(redmineSettingsConfiguration.RedmineURL()), redmineSettingsConfiguration.APIKey());
                     IssueManager issueMgr = mgr.getIssueManager();
@@ -84,11 +92,9 @@ public class SonarqubeIssueInScannerPostJob implements PostJob {
                         setTrackerInfo(redmineIssue, redmineSettingsConfiguration.TrackerId());
                         setUserInfo(redmineIssue, redmineSettingsConfiguration.UserId());
                         redmineIssue.setSubject(ruleKey);
-                        redmineIssue.setDescription(ruleKey + '\n' + message + "\n\n" + "\n\n Source Code location:\n" + component + " Line : " + line + "\n\n" + "check the sonarqube \n<" + redmineSettingsConfiguration.baseUrl() + "/project/issues?id=" + "&open=" + key + "&severities=" + severity);
+                        redmineIssue.setDescription(ruleKey + '\n' + message + "\n\n" + "\n\n Source Code location:\n" + component + " Line : " + line + "\n\n" + "check the sonarqube \n<" + redmineSettingsConfiguration.baseUrl() + "/project/issues?id=" + issue.componentKey() + "&open=" + key + "&severities=" + severity+">");
                         Issue newIssue = issueMgr.createIssue(redmineIssue);
                         issueMgr.update(newIssue);
-                        LOGGER.debug("newIssue.getId()", newIssue.getId());
-                        sonarCommentRegist.sonarconnect(redmineSettingsConfiguration.baseUrl(),key,redmineSettingsConfiguration.RedmineURL(),newIssue.getId());
                     } catch (RedmineException e) {
                         e.printStackTrace();
                     }
@@ -97,19 +103,19 @@ public class SonarqubeIssueInScannerPostJob implements PostJob {
         }
     }
 
-        private void setProjectInfo (Issue issue, String projectKey) throws RedmineException {
-            int intProjectKey = mgr.getProjectManager().getProjectByKey(projectKey).getId();
-            Project project = ProjectFactory.create(intProjectKey);
-            issue.setProject(project);
-        }
-
-        private void setTrackerInfo (Issue issue, String trackerId){
-            Tracker tracker = TrackerFactory.create(Integer.parseInt(trackerId));
-            issue.setTracker(tracker);
-        }
-
-        private void setUserInfo (Issue issue, String UserId){
-            User user = UserFactory.create(Integer.valueOf(UserId));
-            issue.setAssignee(user);
-        }
+    private void setProjectInfo(Issue issue, String projectKey) throws RedmineException {
+        int intProjectKey = mgr.getProjectManager().getProjectByKey(projectKey).getId();
+        Project project = ProjectFactory.create(intProjectKey);
+        issue.setProject(project);
     }
+
+    private void setTrackerInfo(Issue issue, String trackerId) {
+        Tracker tracker = TrackerFactory.create(Integer.parseInt(trackerId));
+        issue.setTracker(tracker);
+    }
+
+    private void setUserInfo(Issue issue, String UserId) {
+        User user = UserFactory.create(Integer.valueOf(UserId));
+        issue.setAssignee(user);
+    }
+}

@@ -105,7 +105,7 @@ public class RedmineSettings {
                         .description("Severity to register automatically. Automatically registers more than the selected severity.")
                         .type(PropertyType.SINGLE_SELECT_LIST)
                         .options(SeverityStatus.BLOCKER.getSeverityLabel(),SeverityStatus.CRITICAL.getSeverityLabel(),SeverityStatus.MIJOR.getSeverityLabel(),SeverityStatus.MINOR.getSeverityLabel(),SeverityStatus.INFO.getSeverityLabel())
-                        .defaultValue(SeverityStatus.BLOCKER.getSeverityLabel())
+                        .defaultValue(String.valueOf(SeverityStatus.BLOCKER.getSeverityLabel()))
                         .category(CATEGORY)
                         .onlyOnQualifiers(Qualifiers.PROJECT)
                         .build()),
