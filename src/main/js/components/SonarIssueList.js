@@ -18,7 +18,8 @@ import {
     settingToRedmineUser,
     findIssueCodeSmell,
     findIssueBug,
-    findIssueVULNERABILITY
+    findIssueVULNERABILITY,
+    SonarHostURL
 } from "../api";
 
 export default class SonarIssueList extends React.PureComponent {
@@ -38,7 +39,8 @@ export default class SonarIssueList extends React.PureComponent {
             changeProject: false,
             changeTracker: false,
             changeUser: false,
-            loading: true
+            loading: true,
+            context:null
         };
         this.handleOpenModal = this.handleOpenModal.bind(this);
         this.handleCloseModal = this.handleCloseModal.bind(this);
@@ -89,6 +91,12 @@ export default class SonarIssueList extends React.PureComponent {
                 });
             }
         );
+        SonarHostURL().then(
+            (hostURL) => {
+                this.setState({
+                    context:hostURL
+                })
+            });
     }
 
     handleOpenModal() {
@@ -176,6 +184,7 @@ export default class SonarIssueList extends React.PureComponent {
                                 project={this.props.project}
                                 issue={issues}
                                 key={idx}
+                                context={this.state.context}
                             />
                     )
                     }

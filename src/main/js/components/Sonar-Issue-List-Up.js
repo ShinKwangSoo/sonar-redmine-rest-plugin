@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import ReactTooltip from 'react-tooltip'
-import {IssueToRedmine, TFRedmine, ruleDataRestAPI,SonarHostURL} from "../api";
+import {IssueToRedmine, TFRedmine, ruleDataRestAPI} from "../api";
 import ReactModal from 'react-modal';
 
 export default class SonarIssueListUp extends React.PureComponent {
@@ -17,7 +17,6 @@ export default class SonarIssueListUp extends React.PureComponent {
             ruleData: '',
             showModalMessage: false,
             isOpenMessage: false,
-            context:''
         };
         this.simplification = this.simplification.bind(this);
         this.TFRedmineToSend = this.TFRedmineToSend.bind(this);
@@ -33,12 +32,6 @@ export default class SonarIssueListUp extends React.PureComponent {
             (commentData) => {
                 this.setState({commentData: commentData})
             })
-        SonarHostURL().then(
-            (hostURL) => {
-                this.setState({
-                    context:hostURL
-                })
-            })
     }
 
 
@@ -46,7 +39,7 @@ export default class SonarIssueListUp extends React.PureComponent {
         if (this.state.commentData === false) {
             let project = this.props.project;
             let issue = this.props.issue;
-            let context=this.state.context;
+            let context=this.props.context;
             let hosturl='';
             if(context[0]===undefined){
                 hosturl=window.location.protocol+'//'+window.location.host;

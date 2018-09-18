@@ -41,7 +41,7 @@ public class RedmineSettingsConfiguration {
         return configuration.getBoolean(RedmineSettings.AUTO_REGIST).orElse(false);
     }
 
-    public boolean Bug() {
+/*    public boolean Bug() {
         return configuration.getBoolean(RedmineSettings.BUG).orElse(true);
     }
 
@@ -51,13 +51,17 @@ public class RedmineSettingsConfiguration {
 
     public boolean VULNERABILITY() {
         return configuration.getBoolean(RedmineSettings.VULNERABILITY).orElse(false);
-    }
+    }*/
 
     public String AUTO_SEVERITY(){
         return SeverityStatus.of(configuration.get(RedmineSettings.AUTO_SEVERITY).orElse(SeverityStatus.BLOCKER.getSeverityLabel()));
     }
     public int AUTO_SEVERITY_LEVEL(String SeverityLabel){
         return SeverityStatus.to(SeverityLabel);
+    }
+
+    public String LevelToLabel(int Level){
+        return SeverityStatus.convert(Level);
     }
 
     @CheckForNull

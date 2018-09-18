@@ -3,7 +3,7 @@
  * All rights reserved
  * mailto:info AT sonarsource DOT com
  */
-import {getJSON,post} from 'sonar-request';
+import {getJSON, post} from 'sonar-request';
 import axios from "axios"; // see https://github.com/SonarSource/sonarqube/blob/master/server/sonar-web/src/main/js/app/utils/exposeLibraries.js
 
 export function findIssueBug(project) {
@@ -11,7 +11,7 @@ export function findIssueBug(project) {
         p: 1,
         ps: 100,
         s: "SEVERITY",
-        asc:false,
+        asc: false,
         types: "BUG",
         resolved: false,
         componentKeys: project.key
@@ -28,14 +28,14 @@ export function findIssueBug(project) {
                     component: "",
                     line: "",
                     message: "",
-                    type:"",
+                    type: "",
                 };
                 result.component = response.issues[i].component;
                 result.line = response.issues[i].line;
                 result.message = response.issues[i].message;
                 result.rule = response.issues[i].rule;
                 result.severity = response.issues[i].severity;
-                result.type=response.issues[i].type;
+                result.type = response.issues[i].type;
                 data[numberOfIssue] = result;
                 numberOfIssue++;
             }
@@ -49,7 +49,7 @@ export function findIssueVULNERABILITY(project) {
         p: 1,
         ps: 100,
         s: "SEVERITY",
-        asc:false,
+        asc: false,
         resolved: false,
         types: "VULNERABILITY",
         componentKeys: project.key
@@ -66,14 +66,14 @@ export function findIssueVULNERABILITY(project) {
                     component: "",
                     line: "",
                     message: "",
-                    type:""
+                    type: ""
                 };
                 result.component = response.issues[i].component;
                 result.line = response.issues[i].line;
                 result.message = response.issues[i].message;
                 result.rule = response.issues[i].rule;
                 result.severity = response.issues[i].severity;
-                result.type=response.issues[i].type;
+                result.type = response.issues[i].type;
                 data[numberOfIssue] = result;
                 numberOfIssue++;
             }
@@ -87,7 +87,7 @@ export function findIssueCodeSmell(project) {
         p: 1,
         ps: 100,
         s: "SEVERITY",
-        asc:false,
+        asc: false,
         resolved: false,
         types: "CODE_SMELL",
         componentKeys: project.key
@@ -104,14 +104,14 @@ export function findIssueCodeSmell(project) {
                     component: "",
                     line: "",
                     message: "",
-                    type:""
+                    type: ""
                 };
                 result.component = response.issues[i].component;
                 result.line = response.issues[i].line;
                 result.message = response.issues[i].message;
                 result.rule = response.issues[i].rule;
                 result.severity = response.issues[i].severity;
-                result.type=response.issues[i].type;
+                result.type = response.issues[i].type;
                 data[numberOfIssue] = result;
                 numberOfIssue++;
             }
@@ -120,72 +120,72 @@ export function findIssueCodeSmell(project) {
     });
 }
 
-    /*return getJSON('/api/issues/search', {
-        p: 1,
-        ps: 500,
-        s: "SEVERITY",
-        types: "CODE_SMELL",
-        componentKey: project.key
-    }).then(function (response) {
-        var data = [];
-        var numberOfIssue = 0;
-        var index=0;
-        if (response.paging.total <= 500) {
-            const numberOfIssueList = response.issues.length;
-            if (numberOfIssueList > 0) {
-                for (let i = 0; i < numberOfIssueList; i++) {
+/*return getJSON('/api/issues/search', {
+    p: 1,
+    ps: 500,
+    s: "SEVERITY",
+    types: "CODE_SMELL",
+    componentKey: project.key
+}).then(function (response) {
+    var data = [];
+    var numberOfIssue = 0;
+    var index=0;
+    if (response.paging.total <= 500) {
+        const numberOfIssueList = response.issues.length;
+        if (numberOfIssueList > 0) {
+            for (let i = 0; i < numberOfIssueList; i++) {
+                let result = {
+                    key: response.issues[i].key,
+                    rule: "",
+                    severity: "",
+                    component: "",
+                    line: "",
+                    message: "",
+                };
+                result.component = response.issues[i].component;
+                result.line = response.issues[i].line;
+                result.message = response.issues[i].message;
+                result.rule = response.issues[i].rule;
+                result.severity = response.issues[i].severity;
+                data[numberOfIssue] = result;
+                numberOfIssue++;
+            }
+        }
+        return data;
+    }
+    else {
+        for (let s = 1; s < Math.ceil(response.paging.total / 500) + 1; s++) {
+            getJSON('/api/issues/search', {
+                p: s,
+                ps: 500,
+                s: "SEVERITY",
+                types: "CODE_SMELL",
+                componentKey: project.key
+            }).then(function (totalresponse) {
+                for (let i = index; i < totalresponse.issues.length+index; i++) {
                     let result = {
-                        key: response.issues[i].key,
+                        key: totalresponse.issues[i].key,
                         rule: "",
                         severity: "",
                         component: "",
                         line: "",
                         message: "",
                     };
-                    result.component = response.issues[i].component;
-                    result.line = response.issues[i].line;
-                    result.message = response.issues[i].message;
-                    result.rule = response.issues[i].rule;
-                    result.severity = response.issues[i].severity;
+                    result.component = totalresponse.issues[i].component;
+                    result.line = totalresponse.issues[i].line;
+                    result.message = totalresponse.issues[i].message;
+                    result.rule = totalresponse.issues[i].rule;
+                    result.severity = totalresponse.issues[i].severity;
                     data[numberOfIssue] = result;
                     numberOfIssue++;
                 }
-            }
-            return data;
+                index = index + 500
+            })
         }
-        else {
-            for (let s = 1; s < Math.ceil(response.paging.total / 500) + 1; s++) {
-                getJSON('/api/issues/search', {
-                    p: s,
-                    ps: 500,
-                    s: "SEVERITY",
-                    types: "CODE_SMELL",
-                    componentKey: project.key
-                }).then(function (totalresponse) {
-                    for (let i = index; i < totalresponse.issues.length+index; i++) {
-                        let result = {
-                            key: totalresponse.issues[i].key,
-                            rule: "",
-                            severity: "",
-                            component: "",
-                            line: "",
-                            message: "",
-                        };
-                        result.component = totalresponse.issues[i].component;
-                        result.line = totalresponse.issues[i].line;
-                        result.message = totalresponse.issues[i].message;
-                        result.rule = totalresponse.issues[i].rule;
-                        result.severity = totalresponse.issues[i].severity;
-                        data[numberOfIssue] = result;
-                        numberOfIssue++;
-                    }
-                    index = index + 500
-                })
-            }
-            console.log("500 over data", data)
-            return data;
-        }
-    });
+        console.log("500 over data", data)
+        return data;
+    }
+});
 }*/
 
 export function RedmineSettingsAPI() {
@@ -354,8 +354,8 @@ export function IssueToRedmine(sonar_project, issue, hosturl) {
     let issuemessage = issue.message;
     let issuecomponent = issue.component;
     let issueline = issue.line;
-    let issueseverity=issue.severity;
-    let issuetype=issue.type;
+    let issueseverity = issue.severity;
+    let issuetype = issue.type;
     let sonar_host_url = hosturl;
     getJSON('/api/settings/values?component=' + sonar_project.key + '&keys=sonar.redmine.hosturl,sonar.redmine.api-access-key,sonar.redmine.project-key,sonar.redmine.tracker-id,sonar.redmine.user-id')
         .then(function (sonarPredmine) {
@@ -389,10 +389,10 @@ export function IssueToRedmine(sonar_project, issue, hosturl) {
                             data = {
                                 "issue": {
                                     "project_id": project,
-                                    "subject": issuerule,
+                                    "subject": "SonarQube Review "+issuerule +" : "+ issuemessage,
                                     "tracker_id": tracker,
                                     "assigned_to_id": user,
-                                    "description": issuerule + '\n' + issuemessage + '\n\n' + '\n\n Source Code location:\n' + issuecomponent + ' Line : ' + issueline + '\n\n' +'check the sonarqube \n<'+sonar_host_url+'/project/issues?id=' + sonar_project.key.replace(':','%3A') + '&open=' + issuekey + '&severities='+issueseverity +'&types='+issuetype +'>'
+                                    "description": issuerule + '\n' + issuemessage + '\n\n' + '\n\n Source Code location:\n' + issuecomponent + ' Line : ' + issueline + '\n\n' + 'check the sonarqube \n<' + sonar_host_url + '/project/issues?id=' + sonar_project.key.replace(':', '%3A') + '&open=' + issuekey + '&severities=' + issueseverity + '&types=' + issuetype + '>'
                                 }
                             };
                             return JSON.stringify(data)
@@ -400,7 +400,10 @@ export function IssueToRedmine(sonar_project, issue, hosturl) {
                     ]
                 }).then(function (restRedmine) {
                     if (restRedmine.status === 201) {
-                        post('/api/issues/add_comment',{issue: issuekey, text: url + '/issues/' + restRedmine.data.issue.id});
+                        post('/api/issues/add_comment', {
+                            issue: issuekey,
+                            text: url + '/issues/' + restRedmine.data.issue.id
+                        });
                     }
                 }).catch(error => {
                     console.log(error.response)
@@ -421,46 +424,48 @@ export function TFRedmine(issue) {
     });
 }
 
-export function ruleDataRestAPI(rulekey){
-    return getJSON('/api/rules/show?key='+rulekey).then(function(ruleResponseData){
-        let ruledata={
+export function ruleDataRestAPI(rulekey) {
+    return getJSON('/api/rules/show?key=' + rulekey).then(function (ruleResponseData) {
+        let ruledata = {
             name: '',
-            htmlDesc:''
+            htmlDesc: ''
         }
-        ruledata.name=ruleResponseData.rule.name;
-        ruledata.htmlDesc=ruleResponseData.rule.htmlDesc;
+        ruledata.name = ruleResponseData.rule.name;
+        ruledata.htmlDesc = ruleResponseData.rule.htmlDesc;
         return ruledata
     })
 }
 
-export function SonarHostURL(){
-    return getJSON('/api/system/info').then(function(responseSettingData){
-        let contextData=[];
-        const ArraySystem=Object.keys(responseSettingData.Settings).reduce(function(out,key){
-           out.push({
-               key:key,
-               value: responseSettingData.Settings[key]
-           });
-           return out;
-        },[]);
-        for(let i=0; i<ArraySystem.length; i++){
-            if(ArraySystem[i].key=="sonar.web.context"){
-                contextData[0]=ArraySystem[i].value;
+export function SonarHostURL() {
+    return getJSON('/api/system/info').then(function (responseSettingData) {
+        let contextData = [];
+        if (responseSettingData.staus != 200 ||responseSettingData.staus != 201) {
+            const ArraySystem = Object.keys(responseSettingData.Settings).reduce(function (out, key) {
+                out.push({
+                    key: key,
+                    value: responseSettingData.Settings[key]
+                });
+                return out;
+            }, []);
+            for (let i = 0; i < ArraySystem.length; i++) {
+                if (ArraySystem[i].key == "sonar.web.context") {
+                    contextData[0] = ArraySystem[i].value;
+                }
             }
+            return contextData;
         }
-        return contextData;
     })
 }
 
 
 export function settingToRedmineProject(project, redmine_projectid) {
-    post('/api/settings/set',{component:project.key, key: 'sonar.redmine.project-key', value:redmine_projectid});
+    post('/api/settings/set', {component: project.key, key: 'sonar.redmine.project-key', value: redmine_projectid});
 }
 
 export function settingToRedmineTracker(project, redmine_trackerid) {
-    post('/api/settings/set',{component:project.key, key: 'sonar.redmine.tracker-id', value:redmine_trackerid});
+    post('/api/settings/set', {component: project.key, key: 'sonar.redmine.tracker-id', value: redmine_trackerid});
 }
 
 export function settingToRedmineUser(project, redmine_userid) {
-    post('/api/settings/set',{component:project.key, key: 'sonar.redmine.user-id', value:redmine_userid});
+    post('/api/settings/set', {component: project.key, key: 'sonar.redmine.user-id', value: redmine_userid});
 }

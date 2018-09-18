@@ -31,6 +31,15 @@ public enum SeverityStatus {
         return BLOCKER.SeverityLevel;
     }
 
+    public static String convert(int level) {
+        for (SeverityStatus s : values()) {
+            if (s.SeverityLevel==level){
+                return s.SeverityLabel;
+            }
+        }
+        return BLOCKER.SeverityLabel;
+    }
+
     public String getSeverityLabel() {
         return SeverityLabel;
     }
