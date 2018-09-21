@@ -25,6 +25,7 @@ export default class SonarIssueListUp extends React.PureComponent {
         this.Go_Redmine_Button = this.Go_Redmine_Button.bind(this);
         this.handleOpenModalMessage = this.handleOpenModalMessage.bind(this);
         this.handleCloseModalMessage = this.handleCloseModalMessage.bind(this);
+        this.sonarGoIssue=this.sonarGoIssue.bind(this);
     }
 
     componentDidMount() {
@@ -58,6 +59,20 @@ export default class SonarIssueListUp extends React.PureComponent {
             this.setState({succeed: false});
             this.Go_Redmine()
         }
+    }
+
+    sonarGoIssue(){
+        let context=this.props.context;
+        let hosturl='';
+        console.log("this.props.project : ",this.props.project);
+        let projectkey=this.props.project.key;
+        let api='/project/issues?id='+projectkey+'&open='+this.props.issue.key+'resolved=false&severities='+this.props.issue.severity +'&types='+this.props.issue.type;
+        if(context[0]===undefined){
+            hosturl=window.location.protocol+'//'+window.location.host+api;
+        }else {
+            hosturl=window.location.protocol+'//'+window.location.host+context[0]+api;
+        }
+        window.open(hosturl)
     }
 
     handleClick() {
@@ -130,14 +145,11 @@ export default class SonarIssueListUp extends React.PureComponent {
                 </td>
                 <td className="thin nowrap text-right">
                     <div className="code-components-cell" data-for={this.props.issue.key} data-tip>
-                        <span>{this.simplificationlast(this.props.issue.component,Math.ceil(this.props.issue.component.length/4))}</span>
+                        <span><a href='#' onClick={this.sonarGoIssue.bind(this)} />{this.simplificationlast(this.props.issue.component,Math.ceil(this.props.issue.component.length/4))}</span>
                             <ReactTooltip id={this.props.issue.key} getContent={[() => {
                                 return this.props.issue.component
                             }]}/>
                     </div>
-                </td>
-                <td className="thin nowrap text-left">
-                    <div className="code-components-cell"><span>{this.props.issue.line}</span></div>
                 </td>
                 <td className="thin nowrap text-left">
                     <div>

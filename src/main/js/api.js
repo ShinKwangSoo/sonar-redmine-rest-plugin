@@ -120,73 +120,21 @@ export function findIssueCodeSmell(project) {
     });
 }
 
-/*return getJSON('/api/issues/search', {
-    p: 1,
-    ps: 500,
-    s: "SEVERITY",
-    types: "CODE_SMELL",
-    componentKey: project.key
-}).then(function (response) {
-    var data = [];
-    var numberOfIssue = 0;
-    var index=0;
-    if (response.paging.total <= 500) {
-        const numberOfIssueList = response.issues.length;
-        if (numberOfIssueList > 0) {
-            for (let i = 0; i < numberOfIssueList; i++) {
-                let result = {
-                    key: response.issues[i].key,
-                    rule: "",
-                    severity: "",
-                    component: "",
-                    line: "",
-                    message: "",
-                };
-                result.component = response.issues[i].component;
-                result.line = response.issues[i].line;
-                result.message = response.issues[i].message;
-                result.rule = response.issues[i].rule;
-                result.severity = response.issues[i].severity;
-                data[numberOfIssue] = result;
-                numberOfIssue++;
-            }
+export function findIssueBug_page(project) {
+    return getJSON('/api/issues/search', {
+        p: 1,
+        ps: 100,
+        s: "SEVERITY",
+        types: "BUG",
+        componentKey: project.key
+    }).then(function (response) {
+        let page=response.paging.total%100;
+        if(page===0){
+            page=1;
         }
-        return data;
-    }
-    else {
-        for (let s = 1; s < Math.ceil(response.paging.total / 500) + 1; s++) {
-            getJSON('/api/issues/search', {
-                p: s,
-                ps: 500,
-                s: "SEVERITY",
-                types: "CODE_SMELL",
-                componentKey: project.key
-            }).then(function (totalresponse) {
-                for (let i = index; i < totalresponse.issues.length+index; i++) {
-                    let result = {
-                        key: totalresponse.issues[i].key,
-                        rule: "",
-                        severity: "",
-                        component: "",
-                        line: "",
-                        message: "",
-                    };
-                    result.component = totalresponse.issues[i].component;
-                    result.line = totalresponse.issues[i].line;
-                    result.message = totalresponse.issues[i].message;
-                    result.rule = totalresponse.issues[i].rule;
-                    result.severity = totalresponse.issues[i].severity;
-                    data[numberOfIssue] = result;
-                    numberOfIssue++;
-                }
-                index = index + 500
-            })
-        }
-        console.log("500 over data", data)
-        return data;
-    }
-});
-}*/
+        return page;
+    });
+}
 
 export function RedmineSettingsAPI() {
     var projectData = [];
@@ -389,7 +337,7 @@ export function IssueToRedmine(sonar_project, issue, hosturl) {
                             data = {
                                 "issue": {
                                     "project_id": project,
-                                    "subject": "SonarQube Review "+issuerule +" : "+ issuemessage,
+                                    "subject": issuerule + " : " + issuemessage,
                                     "tracker_id": tracker,
                                     "assigned_to_id": user,
                                     "description": issuerule + '\n' + issuemessage + '\n\n' + '\n\n Source Code location:\n' + issuecomponent + ' Line : ' + issueline + '\n\n' + 'check the sonarqube \n<' + sonar_host_url + '/project/issues?id=' + sonar_project.key.replace(':', '%3A') + '&open=' + issuekey + '&severities=' + issueseverity + '&types=' + issuetype + '>'
@@ -439,7 +387,7 @@ export function ruleDataRestAPI(rulekey) {
 export function SonarHostURL() {
     return getJSON('/api/system/info').then(function (responseSettingData) {
         let contextData = [];
-        if (responseSettingData.staus != 200 ||responseSettingData.staus != 201) {
+        if (responseSettingData.staus != 200 || responseSettingData.staus != 201) {
             const ArraySystem = Object.keys(responseSettingData.Settings).reduce(function (out, key) {
                 out.push({
                     key: key,

@@ -19,7 +19,7 @@ import {
     findIssueCodeSmell,
     findIssueBug,
     findIssueVULNERABILITY,
-    SonarHostURL
+    SonarHostURL, findIssueBug_test
 } from "../api";
 
 export default class SonarIssueList extends React.PureComponent {
@@ -40,7 +40,7 @@ export default class SonarIssueList extends React.PureComponent {
             changeTracker: false,
             changeUser: false,
             loading: true,
-            context:null
+            context: null
         };
         this.handleOpenModal = this.handleOpenModal.bind(this);
         this.handleCloseModal = this.handleCloseModal.bind(this);
@@ -48,6 +48,7 @@ export default class SonarIssueList extends React.PureComponent {
         this.updateProjectValue = this.updateProjectValue.bind(this);
         this.updateTrackerValue = this.updateTrackerValue.bind(this);
         this.updateUserValue = this.updateUserValue.bind(this);
+        this.showMoreList = this.showMoreList.bind(this);
     }
 
     componentDidMount() {
@@ -94,7 +95,7 @@ export default class SonarIssueList extends React.PureComponent {
         SonarHostURL().then(
             (hostURL) => {
                 this.setState({
-                    context:hostURL
+                    context: hostURL
                 })
             });
     }
@@ -164,6 +165,18 @@ export default class SonarIssueList extends React.PureComponent {
         })
     };
 
+    showMoreList() {
+        findIssueBug_page(this.props.project).then(
+            (valuesReturnedByAPI) => {
+                this.setState({
+                    bug_data: valuesReturnedByAPI,
+                    bug_data_paing: this.state.bug_data_paing+1
+                });
+            }
+        )
+    }
+
+
     SeverityIssue(SeveritySelect) {
         return (
             <table className="data zebra">
@@ -171,7 +184,6 @@ export default class SonarIssueList extends React.PureComponent {
                 <tr className="code-components-header">
                     <th className="thin nowrap text-center code-components-cell">Severity</th>
                     <th className="thin nowrap text-right code-components-cell">Component</th>
-                    <th className="thin nowrap text-left code-components-cell">Line</th>
                     <th className="thin nowrap text-left code-components-cell">message</th>
                     <th className="thin nowrap text-center">To Redmine</th>
                 </tr>
@@ -242,6 +254,9 @@ export default class SonarIssueList extends React.PureComponent {
                         {this.SeverityIssue(this.state.vulnerability_data)}
                     </TabPanel>
                 </Tabs>
+                <div>
+                    <span><a href onClick={this.showMoreList}/> Show More</span>
+                </div>
             </div>
         )
     }
