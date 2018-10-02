@@ -120,19 +120,77 @@ export function findIssueCodeSmell(project) {
     });
 }
 
-export function findIssueBug_page(project) {
+export function findIssue_NextPage(project,count,types) {
     return getJSON('/api/issues/search', {
-        p: 1,
+        p: count,
         ps: 100,
         s: "SEVERITY",
-        types: "BUG",
+        asc: false,
+        types: types,
         componentKey: project.key
     }).then(function (response) {
-        let page=response.paging.total%100;
-        if(page===0){
-            page=1;
+        var data = [];
+        var numberOfIssue = 0;
+        const numberOfIssueList = response.issues.length;
+        if (numberOfIssueList > 0) {
+            for (let i = 0; i < numberOfIssueList; i++) {
+                let result = {
+                    key: response.issues[i].key,
+                    rule: "",
+                    severity: "",
+                    component: "",
+                    line: "",
+                    message: "",
+                    type: ""
+                };
+                result.component = response.issues[i].component;
+                result.line = response.issues[i].line;
+                result.message = response.issues[i].message;
+                result.rule = response.issues[i].rule;
+                result.severity = response.issues[i].severity;
+                result.type = response.issues[i].type;
+                data[numberOfIssue] = result;
+                numberOfIssue++;
+            }
         }
-        return page;
+        return data;
+    });
+}
+
+export function findIssueCODE_SMELL_NextPage(project,count) {
+    return getJSON('/api/issues/search', {
+        p: count,
+        ps: 100,
+        s: "SEVERITY",
+        asc: false,
+        types: "CODE_SMELL",
+        componentKey: project.key
+    }).then(function (response) {
+        var data = [];
+        var numberOfIssue = 0;
+        const numberOfIssueList = response.issues.length;
+        if (numberOfIssueList > 0) {
+            for (let i = 0; i < numberOfIssueList; i++) {
+                let result = {
+                    key: response.issues[i].key,
+                    rule: "",
+                    severity: "",
+                    component: "",
+                    line: "",
+                    message: "",
+                    type: ""
+                };
+                result.component = response.issues[i].component;
+                result.line = response.issues[i].line;
+                result.message = response.issues[i].message;
+                result.rule = response.issues[i].rule;
+                result.severity = response.issues[i].severity;
+                result.type = response.issues[i].type;
+                data[numberOfIssue] = result;
+                numberOfIssue++;
+            }
+        }
+        return data;
     });
 }
 

@@ -7,6 +7,8 @@ import React from 'react';
 import ReactTooltip from 'react-tooltip'
 import {IssueToRedmine, TFRedmine, ruleDataRestAPI} from "../api";
 import ReactModal from 'react-modal';
+import Checkbox from 'rc-checkbox';
+import 'rc-checkbox/assets/index.css';
 
 export default class SonarIssueListUp extends React.PureComponent {
     constructor(props) {
@@ -17,6 +19,7 @@ export default class SonarIssueListUp extends React.PureComponent {
             ruleData: '',
             showModalMessage: false,
             isOpenMessage: false,
+            disabled: false
         };
         this.simplification = this.simplification.bind(this);
         this.TFRedmineToSend = this.TFRedmineToSend.bind(this);
@@ -25,7 +28,8 @@ export default class SonarIssueListUp extends React.PureComponent {
         this.Go_Redmine_Button = this.Go_Redmine_Button.bind(this);
         this.handleOpenModalMessage = this.handleOpenModalMessage.bind(this);
         this.handleCloseModalMessage = this.handleCloseModalMessage.bind(this);
-        this.sonarGoIssue=this.sonarGoIssue.bind(this);
+        this.sonarGoIssue = this.sonarGoIssue.bind(this);
+        this.onChange=this.onChange.bind(this);
     }
 
     componentDidMount() {
@@ -35,17 +39,20 @@ export default class SonarIssueListUp extends React.PureComponent {
             })
     }
 
+    onChange(e){
+        console.log(e.target.checked, " : " , e.target.name);
+    }
 
     TFRedmineToSend() {
         if (this.state.commentData === false) {
             let project = this.props.project;
             let issue = this.props.issue;
-            let context=this.props.context;
-            let hosturl='';
-            if(context[0]===undefined){
-                hosturl=window.location.protocol+'//'+window.location.host;
-            }else {
-                hosturl=window.location.protocol+'//'+window.location.host+context[0];
+            let context = this.props.context;
+            let hosturl = '';
+            if (context[0] === undefined) {
+                hosturl = window.location.protocol + '//' + window.location.host;
+            } else {
+                hosturl = window.location.protocol + '//' + window.location.host + context[0];
             }
             return (
                 <span>
@@ -61,16 +68,16 @@ export default class SonarIssueListUp extends React.PureComponent {
         }
     }
 
-    sonarGoIssue(){
-        let context=this.props.context;
-        let hosturl='';
-        console.log("this.props.project : ",this.props.project);
-        let projectkey=this.props.project.key;
-        let api='/project/issues?id='+projectkey+'&open='+this.props.issue.key+'resolved=false&severities='+this.props.issue.severity +'&types='+this.props.issue.type;
-        if(context[0]===undefined){
-            hosturl=window.location.protocol+'//'+window.location.host+api;
-        }else {
-            hosturl=window.location.protocol+'//'+window.location.host+context[0]+api;
+    sonarGoIssue() {
+        let context = this.props.context;
+        let hosturl = '';
+        console.log("this.props.project : ", this.props.project);
+        let projectkey = this.props.project.key;
+        let api = '/project/issues?id=' + projectkey + '&open=' + this.props.issue.key + 'resolved=false&severities=' + this.props.issue.severity + '&types=' + this.props.issue.type;
+        if (context[0] === undefined) {
+            hosturl = window.location.protocol + '//' + window.location.host + api;
+        } else {
+            hosturl = window.location.protocol + '//' + window.location.host + context[0] + api;
         }
         window.open(hosturl)
     }
@@ -140,21 +147,36 @@ export default class SonarIssueListUp extends React.PureComponent {
         );
         return (
             <tr>
+                <td>
+                    <p>
+                        <label>
+                            <Checkbox
+                                name={this.props.issue.key}
+                                onChange={(e)=>this.onChange(e)}
+                                disabled={this.state.disabled}
+                                />
+                        </label>
+                    </p>
+                </td>
                 <td className="thin nowrap text-center">
                     <div className="code-components-cell"><span>{this.props.issue.severity}</span></div>
                 </td>
                 <td className="thin nowrap text-right">
                     <div className="code-components-cell" data-for={this.props.issue.key} data-tip>
-                        <span><a href='#' onClick={this.sonarGoIssue.bind(this)} />{this.simplificationlast(this.props.issue.component,Math.ceil(this.props.issue.component.length/4))}</span>
-                            <ReactTooltip id={this.props.issue.key} getContent={[() => {
-                                return this.props.issue.component
-                            }]}/>
+                        <span><a href='#'
+                                 onClick={this.sonarGoIssue.bind(this)}/>{this.simplificationlast(this.props.issue.component, Math.ceil(this.props.issue.component.length / 4))}</span>
+                        <ReactTooltip id={this.props.issue.key} getContent={[() => {
+                            return this.props.issue.component
+                        }]}/>
                     </div>
                 </td>
                 <td className="thin nowrap text-left">
                     <div>
                         <span><a href='#'
-                                 onClick={event => {event.preventDefault(); this.handleOpenModalMessage(this.props.issue.rule)}}>{this.simplification(this.props.issue.message, 30)}</a></span>
+                                 onClick={event => {
+                                     event.preventDefault();
+                                     this.handleOpenModalMessage(this.props.issue.rule)
+                                 }}>{this.simplification(this.props.issue.message, 30)}</a></span>
                         <ReactModal
                             isOpen={this.state.showModalMessage}
                             style={{

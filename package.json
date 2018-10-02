@@ -79,8 +79,10 @@
     ]
   },
   "dependencies": {
+    "@material/checkbox": "^0.40.0",
     "axios": "^0.18.0",
     "prop-types": "^15.6.2",
+    "rc-checkbox": "^2.1.5",
     "react-modal": "^3.4.5",
     "react-select": "^1.2.1",
     "react-tabs": "^2.2.2",

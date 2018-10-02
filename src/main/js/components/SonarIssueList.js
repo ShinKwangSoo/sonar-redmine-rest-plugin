@@ -9,7 +9,12 @@ import SonarIssueListUp from "./Sonar-Issue-List-Up";
 import RedmineSettings from "./RedmineSettings";
 import {Tabs, TabList, Tab, TabPanel} from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
+const labelStyle = {
+    width:"150",
+    height:"10",
+    minWidth: "10",
 
+};
 import {
     RedmineSettingsAPI,
     saveSettingToRedmine,
@@ -19,7 +24,7 @@ import {
     findIssueCodeSmell,
     findIssueBug,
     findIssueVULNERABILITY,
-    SonarHostURL, findIssueBug_test
+    SonarHostURL, findIssue_NextPage, findIssueCODE_SMELL_NextPage, RedmineUserList
 } from "../api";
 
 export default class SonarIssueList extends React.PureComponent {
@@ -40,7 +45,10 @@ export default class SonarIssueList extends React.PureComponent {
             changeTracker: false,
             changeUser: false,
             loading: true,
-            context: null
+            context: null,
+            bug_data_paging:2,
+            code_smell_paging:2,
+            vulnerability_paging:2
         };
         this.handleOpenModal = this.handleOpenModal.bind(this);
         this.handleCloseModal = this.handleCloseModal.bind(this);
@@ -48,7 +56,11 @@ export default class SonarIssueList extends React.PureComponent {
         this.updateProjectValue = this.updateProjectValue.bind(this);
         this.updateTrackerValue = this.updateTrackerValue.bind(this);
         this.updateUserValue = this.updateUserValue.bind(this);
-        this.showMoreList = this.showMoreList.bind(this);
+        this.showMoreBugList = this.showMoreBugList.bind(this);
+        this.showMoreCodeSmellList = this.showMoreCodeSmellList.bind(this);
+        this.showMoreVulList = this.showMoreVulList.bind(this);
+        this.ToRedmineUserList=this.ToRedmineUserList.bind(this);
+        this.ToRedmineFunction=this.ToRedmineFunction.bind(this);
     }
 
     componentDidMount() {
@@ -165,17 +177,37 @@ export default class SonarIssueList extends React.PureComponent {
         })
     };
 
-    showMoreList() {
-        findIssueBug_page(this.props.project).then(
+    showMoreBugList() {
+        findIssue_NextPage(this.props.project, this.state.bug_data_paging,"BUG").then(
             (valuesReturnedByAPI) => {
                 this.setState({
-                    bug_data: valuesReturnedByAPI,
-                    bug_data_paing: this.state.bug_data_paing+1
+                    bug_data: this.state.bug_data.concat(valuesReturnedByAPI),
+                    bug_data_paging: this.state.bug_data_paging+1
                 });
             }
         )
     }
 
+    showMoreCodeSmellList() {
+        findIssueCODE_SMELL_NextPage(this.props.project, this.state.code_smell_paging).then(
+            (valuesReturnedByAPI) => {
+                this.setState({
+                    code_smell_data: this.state.code_smell_data.concat(valuesReturnedByAPI),
+                    code_smell_paging: this.state.code_smell_paging+1
+                });
+            }
+        )
+    }
+    showMoreVulList() {
+        findIssue_NextPage(this.props.project, this.state.vulnerability_paging,"VULNERABILITY").then(
+            (valuesReturnedByAPI) => {
+                this.setState({
+                    vulnerability_data: this.state.vulnerability_data.concat(valuesReturnedByAPI),
+                    vulnerability_paging: this.state.vulnerability_paging+1
+                });
+            }
+        )
+    }
 
     SeverityIssue(SeveritySelect) {
         return (
@@ -205,9 +237,70 @@ export default class SonarIssueList extends React.PureComponent {
         )
     }
 
+    ToRedmineFunction(){
+
+    }
+
+
+    ToRedmineUserList() {
+        let redmineprojectName = [];
+        for (let i = 0, redmineprojectNumber = 0; i < this.state.settings[2].length; i++) {
+            let result = {
+                value: this.state.settings[2][i].id,
+                label: this.state.settings[2][i].firstname,
+                id: this.state.settings[2][i].id
+            };
+            redmineprojectName[redmineprojectNumber] = result;
+            redmineprojectNumber++;
+        }
+        return redmineprojectName;
+    }
+
     render() {
         return (
             <div className="code-components-cell">
+                <div>
+                    <button className="page-actions" onClick={this.handleOpenModal}>Test</button>
+                    <ReactModal
+                        isOpen={this.state.showModal}
+                        style={{
+                            content: {
+                                top: '30%',
+                                left: '80%',
+                                right: 'auto',
+                                bottom: 'auto',
+                                marginRight: '-50%',
+                                transform: 'translate(-50%, -50%)'
+                            }
+                        }}>
+                        <div>
+                           <table>
+                               <tr>
+                                   <th>
+                                       <div className="code-components-cell"><span><h3>Redmine Users : </h3></span></div>
+                                   </th>
+                                   <th>
+                                       <div className="selection">
+                                           <Select id="users-select"
+                                                   name="users-select"
+                                                   style={labelStyle}
+                                                   options={this.ToRedmineUserList}
+                                                   value={this.state.selectUserValue}
+                                                   searchable={true}
+                                                   simpleValue
+                                                   autoFocus={true}
+                                                   clearable={false}
+                                                   onChange={this.updateUserValue}
+                                           />
+                                       </div>
+                                   </th>
+                               </tr>
+                           </table>
+                        </div>
+                        <button onClick={this.ToRedmineFunction}>ToRedmine</button>
+                        <button onClick={this.handleCloseModal}>Close</button>
+                    </ReactModal>
+                </div>
                 <div>
                     <button className="page-actions" onClick={this.handleOpenModal}>Settings</button>
                     <ReactModal
@@ -223,7 +316,6 @@ export default class SonarIssueList extends React.PureComponent {
                             }
                         }}>
                         <div>
-
                             <RedmineSettings saveData={this.state.saveData}
                                              container={this.state.settings}
                                              projectDefault={this.state.selectProjectValue}
@@ -246,17 +338,17 @@ export default class SonarIssueList extends React.PureComponent {
                     </TabList>
                     <TabPanel>
                         {this.SeverityIssue(this.state.bug_data)}
+                        <button className="spacer-top note text-center" onClick={this.showMoreBugList}>Show More</button>
                     </TabPanel>
                     <TabPanel>
                         {this.SeverityIssue(this.state.code_smell_data)}
+                        <button className="spacer-top note text-center" onClick={this.showMoreCodeSmellList}>Show More</button>
                     </TabPanel>
                     <TabPanel>
                         {this.SeverityIssue(this.state.vulnerability_data)}
+                        <button className="spacer-top note text-center" onClick={this.showMoreVulList}>Show More</button>
                     </TabPanel>
                 </Tabs>
-                <div>
-                    <span><a href onClick={this.showMoreList}/> Show More</span>
-                </div>
             </div>
         )
     }
