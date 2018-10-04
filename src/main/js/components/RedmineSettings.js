@@ -19,12 +19,11 @@ export default class RedmineSettings extends React.Component {
     RedmineProjectList() {
         let redminetrackerName = [];
         for (let i = 0, redminetrackerNumber = 0; i < this.props.container[0].length; i++) {
-            let result = {
+            redminetrackerName[redminetrackerNumber] = {
                 value: this.props.container[0][i].id,
                 label: this.props.container[0][i].name,
                 id: this.props.container[0][i].id
             };
-            redminetrackerName[redminetrackerNumber] = result;
             redminetrackerNumber++;
         }
         return redminetrackerName;
@@ -33,12 +32,11 @@ export default class RedmineSettings extends React.Component {
     RedmineTrackerList() {
         let redmineUserName = [];
         for (let i = 0, redmineUserNumber = 0; i < this.props.container[1].length; i++) {
-            let result = {
+            redmineUserName[redmineUserNumber] = {
                 value: this.props.container[1][i].id,
                 label: this.props.container[1][i].name,
                 id: this.props.container[1][i].id
             };
-            redmineUserName[redmineUserNumber] = result;
             redmineUserNumber++;
         }
         return redmineUserName;
@@ -47,12 +45,11 @@ export default class RedmineSettings extends React.Component {
     RedmineUserList() {
         let redmineprojectName = [];
         for (let i = 0, redmineprojectNumber = 0; i < this.props.container[2].length; i++) {
-            let result = {
+            redmineprojectName[redmineprojectNumber] = {
                 value: this.props.container[2][i].id,
                 label: this.props.container[2][i].firstname,
                 id: this.props.container[2][i].id
             };
-            redmineprojectName[redmineprojectNumber] = result;
             redmineprojectNumber++;
         }
         return redmineprojectName;

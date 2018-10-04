@@ -40,7 +40,14 @@ export default class SonarIssueListUp extends React.PureComponent {
     }
 
     onChange(e){
-        console.log(e.target.checked, " : " , e.target.name);
+        console.log(e.target.name);
+        let temp_list_data=this.props.issue_list_tmp;
+       if(e.target.checked){
+           temp_list_data.add(e.target.name)
+       }else{
+           temp_list_data.delete(e.target.name)
+       }
+       this.setState({temp_list_data})
     }
 
     TFRedmineToSend() {

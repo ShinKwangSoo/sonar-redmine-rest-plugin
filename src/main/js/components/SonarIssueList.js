@@ -7,25 +7,30 @@ import React from 'react';
 import ReactModal from 'react-modal';
 import SonarIssueListUp from "./Sonar-Issue-List-Up";
 import RedmineSettings from "./RedmineSettings";
-import {Tabs, TabList, Tab, TabPanel} from 'react-tabs';
+import {Tab, TabList, TabPanel, Tabs} from 'react-tabs';
+import Select from 'react-select';
 import 'react-tabs/style/react-tabs.css';
-const labelStyle = {
-    width:"150",
-    height:"10",
-    minWidth: "10",
-
-};
 import {
+    findIssue_NextPage,
+    findIssueBug,
+    findIssueCODE_SMELL_NextPage,
+    findIssueCodeSmell,
+    findIssueVULNERABILITY, IssueToRedmine,
     RedmineSettingsAPI,
     saveSettingToRedmine,
     settingToRedmineProject,
     settingToRedmineTracker,
     settingToRedmineUser,
-    findIssueCodeSmell,
-    findIssueBug,
-    findIssueVULNERABILITY,
-    SonarHostURL, findIssue_NextPage, findIssueCODE_SMELL_NextPage, RedmineUserList
+    SonarHostURL
 } from "../api";
+import CheckListToRedmine from "./CheckListToRedmine";
+
+const labelStyle = {
+    width: "150",
+    height: "10",
+    minWidth: "10",
+
+};
 
 export default class SonarIssueList extends React.PureComponent {
     constructor(props) {
@@ -46,10 +51,12 @@ export default class SonarIssueList extends React.PureComponent {
             changeUser: false,
             loading: true,
             context: null,
-            bug_data_paging:2,
-            code_smell_paging:2,
-            vulnerability_paging:2
-        };
+            bug_data_paging: 2,
+            code_smell_paging: 2,
+            vulnerability_paging: 2,
+            issue_list_tmp: new Set()
+        }
+        ;
         this.handleOpenModal = this.handleOpenModal.bind(this);
         this.handleCloseModal = this.handleCloseModal.bind(this);
         this.submitFunction = this.submitFunction.bind(this);
@@ -59,7 +66,6 @@ export default class SonarIssueList extends React.PureComponent {
         this.showMoreBugList = this.showMoreBugList.bind(this);
         this.showMoreCodeSmellList = this.showMoreCodeSmellList.bind(this);
         this.showMoreVulList = this.showMoreVulList.bind(this);
-        this.ToRedmineUserList=this.ToRedmineUserList.bind(this);
         this.ToRedmineFunction=this.ToRedmineFunction.bind(this);
     }
 
@@ -178,11 +184,11 @@ export default class SonarIssueList extends React.PureComponent {
     };
 
     showMoreBugList() {
-        findIssue_NextPage(this.props.project, this.state.bug_data_paging,"BUG").then(
+        findIssue_NextPage(this.props.project, this.state.bug_data_paging, "BUG").then(
             (valuesReturnedByAPI) => {
                 this.setState({
                     bug_data: this.state.bug_data.concat(valuesReturnedByAPI),
-                    bug_data_paging: this.state.bug_data_paging+1
+                    bug_data_paging: this.state.bug_data_paging + 1
                 });
             }
         )
@@ -193,17 +199,18 @@ export default class SonarIssueList extends React.PureComponent {
             (valuesReturnedByAPI) => {
                 this.setState({
                     code_smell_data: this.state.code_smell_data.concat(valuesReturnedByAPI),
-                    code_smell_paging: this.state.code_smell_paging+1
+                    code_smell_paging: this.state.code_smell_paging + 1
                 });
             }
         )
     }
+
     showMoreVulList() {
-        findIssue_NextPage(this.props.project, this.state.vulnerability_paging,"VULNERABILITY").then(
+        findIssue_NextPage(this.props.project, this.state.vulnerability_paging, "VULNERABILITY").then(
             (valuesReturnedByAPI) => {
                 this.setState({
                     vulnerability_data: this.state.vulnerability_data.concat(valuesReturnedByAPI),
-                    vulnerability_paging: this.state.vulnerability_paging+1
+                    vulnerability_paging: this.state.vulnerability_paging + 1
                 });
             }
         )
@@ -214,6 +221,7 @@ export default class SonarIssueList extends React.PureComponent {
             <table className="data zebra">
                 <thead>
                 <tr className="code-components-header">
+                    <th className="thin nowrap text-center code-components-cell"> </th>
                     <th className="thin nowrap text-center code-components-cell">Severity</th>
                     <th className="thin nowrap text-right code-components-cell">Component</th>
                     <th className="thin nowrap text-left code-components-cell">message</th>
@@ -229,6 +237,7 @@ export default class SonarIssueList extends React.PureComponent {
                                 issue={issues}
                                 key={idx}
                                 context={this.state.context}
+                                issue_list_tmp={this.state.issue_list_tmp}
                             />
                     )
                     }
@@ -238,22 +247,19 @@ export default class SonarIssueList extends React.PureComponent {
     }
 
     ToRedmineFunction(){
-
-    }
-
-
-    ToRedmineUserList() {
-        let redmineprojectName = [];
-        for (let i = 0, redmineprojectNumber = 0; i < this.state.settings[2].length; i++) {
-            let result = {
-                value: this.state.settings[2][i].id,
-                label: this.state.settings[2][i].firstname,
-                id: this.state.settings[2][i].id
-            };
-            redmineprojectName[redmineprojectNumber] = result;
-            redmineprojectNumber++;
+        console.log(this.state.issue_list_tmp);
+        let context = this.state.context;
+        let hosturl = '';
+        if (context[0] === undefined) {
+            hosturl = window.location.protocol + '//' + window.location.host;
+        } else {
+            hosturl = window.location.protocol + '//' + window.location.host + context[0];
         }
-        return redmineprojectName;
+        for(let i=0; i<this.state.issue_list_tmp.length;i++){
+            IssueToRedmine(this.props.project, this.state.issue_list_tmp[i],hosturl);
+        }
+        this.handleCloseModal();
+        window.location.reload();
     }
 
     render() {
@@ -274,28 +280,10 @@ export default class SonarIssueList extends React.PureComponent {
                             }
                         }}>
                         <div>
-                           <table>
-                               <tr>
-                                   <th>
-                                       <div className="code-components-cell"><span><h3>Redmine Users : </h3></span></div>
-                                   </th>
-                                   <th>
-                                       <div className="selection">
-                                           <Select id="users-select"
-                                                   name="users-select"
-                                                   style={labelStyle}
-                                                   options={this.ToRedmineUserList}
-                                                   value={this.state.selectUserValue}
-                                                   searchable={true}
-                                                   simpleValue
-                                                   autoFocus={true}
-                                                   clearable={false}
-                                                   onChange={this.updateUserValue}
-                                           />
-                                       </div>
-                                   </th>
-                               </tr>
-                           </table>
+                           <CheckListToRedmine container={this.state.settings}
+                                               userDefault={this.state.selectUserValue}
+                                               userValue={this.updateUserValue}
+                           />
                         </div>
                         <button onClick={this.ToRedmineFunction}>ToRedmine</button>
                         <button onClick={this.handleCloseModal}>Close</button>
@@ -338,15 +326,18 @@ export default class SonarIssueList extends React.PureComponent {
                     </TabList>
                     <TabPanel>
                         {this.SeverityIssue(this.state.bug_data)}
-                        <button className="spacer-top note text-center" onClick={this.showMoreBugList}>Show More</button>
+                        <button className="spacer-top note text-center" onClick={this.showMoreBugList}>Show More
+                        </button>
                     </TabPanel>
                     <TabPanel>
                         {this.SeverityIssue(this.state.code_smell_data)}
-                        <button className="spacer-top note text-center" onClick={this.showMoreCodeSmellList}>Show More</button>
+                        <button className="spacer-top note text-center" onClick={this.showMoreCodeSmellList}>Show More
+                        </button>
                     </TabPanel>
                     <TabPanel>
                         {this.SeverityIssue(this.state.vulnerability_data)}
-                        <button className="spacer-top note text-center" onClick={this.showMoreVulList}>Show More</button>
+                        <button className="spacer-top note text-center" onClick={this.showMoreVulList}>Show More
+                        </button>
                     </TabPanel>
                 </Tabs>
             </div>
