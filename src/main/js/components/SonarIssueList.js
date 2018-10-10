@@ -8,7 +8,6 @@ import ReactModal from 'react-modal';
 import SonarIssueListUp from "./Sonar-Issue-List-Up";
 import RedmineSettings from "./RedmineSettings";
 import {Tab, TabList, TabPanel, Tabs} from 'react-tabs';
-import Select from 'react-select';
 import 'react-tabs/style/react-tabs.css';
 import {
     findIssue_NextPage,
@@ -49,7 +48,7 @@ export default class SonarIssueList extends React.PureComponent {
             changeProject: false,
             changeTracker: false,
             changeUser: false,
-            loading: true,
+            loading: false,
             context: null,
             bug_data_paging: 2,
             code_smell_paging: 2,
@@ -70,6 +69,9 @@ export default class SonarIssueList extends React.PureComponent {
     }
 
     componentDidMount() {
+        this.setState({
+            loading:true
+        });
         findIssueBug(this.props.project).then(
             (valuesReturnedByAPI) => {
                 this.setState({
@@ -119,6 +121,7 @@ export default class SonarIssueList extends React.PureComponent {
     }
 
     handleOpenModal() {
+        console.log(this.state.issue_list_tmp);
         this.setState({
             showModal: true,
             selectProjectValue: this.state.saveData[0],
@@ -266,7 +269,7 @@ export default class SonarIssueList extends React.PureComponent {
         return (
             <div className="code-components-cell">
                 <div>
-                    <button className="page-actions" onClick={this.handleOpenModal}>Test</button>
+                    <button className="page-actions" onClick={this.handleOpenModal} disabled={!this.state.loading}>Test</button>
                     <ReactModal
                         isOpen={this.state.showModal}
                         style={{
@@ -290,7 +293,7 @@ export default class SonarIssueList extends React.PureComponent {
                     </ReactModal>
                 </div>
                 <div>
-                    <button className="page-actions" onClick={this.handleOpenModal}>Settings</button>
+                    <button className="page-actions" onClick={this.handleOpenModal} disabled={!this.state.loading}>Settings</button>
                     <ReactModal
                         isOpen={this.state.showModal}
                         style={{
