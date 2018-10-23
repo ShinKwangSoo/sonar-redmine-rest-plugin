@@ -14,9 +14,9 @@ import {
     findIssueBug,
     findIssueCODE_SMELL_NextPage,
     findIssueCodeSmell,
-    findIssueVULNERABILITY, IssueToRedmine,
+    findIssueVULNERABILITY,
     RedmineSettingsAPI,
-    saveSettingToRedmine,
+    saveSettingToRedmine, SelectedIssueToRedmine,
     settingToRedmineProject,
     settingToRedmineTracker,
     settingToRedmineUser,
@@ -40,6 +40,7 @@ export default class SonarIssueList extends React.PureComponent {
             vulnerability_data: [],
             isOpen: false,
             showModal: false,
+            showModal2:false,
             settings: [],
             saveData: [],
             selectProjectValue: {},
@@ -57,7 +58,9 @@ export default class SonarIssueList extends React.PureComponent {
         }
         ;
         this.handleOpenModal = this.handleOpenModal.bind(this);
+        this.handleOpenModalToSetting=this.handleOpenModalToSetting.bind(this);
         this.handleCloseModal = this.handleCloseModal.bind(this);
+        this.handleCloseModal2 = this.handleCloseModal2.bind(this);
         this.submitFunction = this.submitFunction.bind(this);
         this.updateProjectValue = this.updateProjectValue.bind(this);
         this.updateTrackerValue = this.updateTrackerValue.bind(this);
@@ -69,9 +72,6 @@ export default class SonarIssueList extends React.PureComponent {
     }
 
     componentDidMount() {
-        this.setState({
-            loading:true
-        });
         findIssueBug(this.props.project).then(
             (valuesReturnedByAPI) => {
                 this.setState({
@@ -130,8 +130,19 @@ export default class SonarIssueList extends React.PureComponent {
         });
     }
 
+    handleOpenModalToSetting() {
+        console.log(this.state.issue_list_tmp);
+        this.setState({
+            showModal2: true,
+            selectUserValue: this.state.saveData[2]
+        });
+    }
+
     handleCloseModal() {
         this.setState({showModal: false});
+    }
+    handleCloseModal2() {
+        this.setState({showModal2: false});
     }
 
     submitFunction() {
@@ -258,20 +269,25 @@ export default class SonarIssueList extends React.PureComponent {
         } else {
             hosturl = window.location.protocol + '//' + window.location.host + context[0];
         }
-        for(let i=0; i<this.state.issue_list_tmp.length;i++){
-            IssueToRedmine(this.props.project, this.state.issue_list_tmp[i],hosturl);
+        console.log("this.state.selectUserValue : "+this.state.selectUserValue);
+        console.log("hosurl : "+hosturl);
+        console.log("this.state.issue_list_tmp.size : "+this.state.issue_list_tmp.size);
+        let issue_data=[];
+        this.state.issue_list_tmp.forEach(data => issue_data.push(data));
+        for(let data of issue_data){
+            console.log("issue_data : "+issue_data)
+            SelectedIssueToRedmine(this.props.project,data,hosturl,this.state.selectUserValue);
         }
         this.handleCloseModal();
-        window.location.reload();
     }
 
     render() {
         return (
             <div className="code-components-cell">
                 <div>
-                    <button className="page-actions" onClick={this.handleOpenModal} disabled={!this.state.loading}>Test</button>
+                    <button className="page-actions" onClick={this.handleOpenModalToSetting} disabled={this.state.loading}>Select ToRedmine</button>
                     <ReactModal
-                        isOpen={this.state.showModal}
+                        isOpen={this.state.showModal2}
                         style={{
                             content: {
                                 top: '30%',
@@ -279,7 +295,9 @@ export default class SonarIssueList extends React.PureComponent {
                                 right: 'auto',
                                 bottom: 'auto',
                                 marginRight: '-50%',
-                                transform: 'translate(-50%, -50%)'
+                                transform: 'translate(-50%, -50%)',
+                                border: '1px solid',
+                                backgroundColor : 'white'
                             }
                         }}>
                         <div>
@@ -288,12 +306,13 @@ export default class SonarIssueList extends React.PureComponent {
                                                userValue={this.updateUserValue}
                            />
                         </div>
+                        <div> </div>
                         <button onClick={this.ToRedmineFunction}>ToRedmine</button>
-                        <button onClick={this.handleCloseModal}>Close</button>
+                        <button onClick={this.handleCloseModal2}>Close</button>
                     </ReactModal>
                 </div>
                 <div>
-                    <button className="page-actions" onClick={this.handleOpenModal} disabled={!this.state.loading}>Settings</button>
+                    <button className="page-actions" onClick={this.handleOpenModal} disabled={this.state.loading}>Settings</button>
                     <ReactModal
                         isOpen={this.state.showModal}
                         style={{
@@ -303,7 +322,9 @@ export default class SonarIssueList extends React.PureComponent {
                                 right: 'auto',
                                 bottom: 'auto',
                                 marginRight: '-50%',
-                                transform: 'translate(-50%, -50%)'
+                                transform: 'translate(-50%, -50%)',
+                                border: '1px solid',
+                                backgroundColor : 'white'
                             }
                         }}>
                         <div>

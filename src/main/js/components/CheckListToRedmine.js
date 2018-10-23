@@ -33,12 +33,12 @@ export default class CheckListToRedmine extends React.Component {
             <table>
                 <tr>
                     <th>
-                        <div className="code-components-cell"><span><h3>Redmine Projects : </h3></span></div>
+                        <div className="code-components-cell"><span><h3>Redmine User : </h3></span></div>
                     </th>
                     <th>
                         <span className="selection">
-                            <Select id="project-select"
-                                    name="project-select"
+                            <Select id="user-select"
+                                    name="user-select"
                                     style={labelStyle}
                                     options={this.RedmineUserList()}
                                     searchable={true}

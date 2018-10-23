@@ -158,7 +158,7 @@ export default class SonarIssueListUp extends React.PureComponent {
                     <p>
                         <label>
                             <Checkbox
-                                name={this.props.issue.key}
+                                name={this.props.issue}
                                 onChange={(e)=>this.onChange(e)}
                                 disabled={this.state.disabled}
                                 />
