@@ -29,7 +29,7 @@ export default class SonarIssueListUp extends React.PureComponent {
         this.handleOpenModalMessage = this.handleOpenModalMessage.bind(this);
         this.handleCloseModalMessage = this.handleCloseModalMessage.bind(this);
         this.sonarGoIssue = this.sonarGoIssue.bind(this);
-        this.onChange=this.onChange.bind(this);
+        this.onChange = this.onChange.bind(this);
     }
 
     componentDidMount() {
@@ -39,15 +39,15 @@ export default class SonarIssueListUp extends React.PureComponent {
             })
     }
 
-    onChange(e){
+    onChange(e) {
         console.log(e.target.name);
-        let temp_list_data=this.props.issue_list_tmp;
-       if(e.target.checked){
-           temp_list_data.add(e.target.name)
-       }else{
-           temp_list_data.delete(e.target.name)
-       }
-       this.setState({temp_list_data})
+        let temp_list_data = this.props.issue_list_tmp;
+        if (e.target.checked) {
+            temp_list_data.add(e.target.name)
+        } else {
+            temp_list_data.delete(e.target.name)
+        }
+        this.setState({temp_list_data})
     }
 
     TFRedmineToSend() {
@@ -155,15 +155,15 @@ export default class SonarIssueListUp extends React.PureComponent {
         return (
             <tr>
                 <td>
-                    <p>
-                        <label>
-                            <Checkbox
-                                name={this.props.issue}
-                                onChange={(e)=>this.onChange(e)}
-                                disabled={this.state.disabled}
-                                />
-                        </label>
-                    </p>
+                    <span>
+                    <label>
+                        <Checkbox
+                            name={this.props.issue}
+                            onChange={(e) => this.onChange(e)}
+                            disabled={this.state.disabled}
+                        />
+                    </label>
+                    </span>
                 </td>
                 <td className="thin nowrap text-center">
                     <div className="code-components-cell"><span>{this.props.issue.severity}</span></div>

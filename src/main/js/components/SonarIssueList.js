@@ -40,7 +40,7 @@ export default class SonarIssueList extends React.PureComponent {
             vulnerability_data: [],
             isOpen: false,
             showModal: false,
-            showModal2:false,
+            showModal2: false,
             settings: [],
             saveData: [],
             selectProjectValue: {},
@@ -58,7 +58,7 @@ export default class SonarIssueList extends React.PureComponent {
         }
         ;
         this.handleOpenModal = this.handleOpenModal.bind(this);
-        this.handleOpenModalToSetting=this.handleOpenModalToSetting.bind(this);
+        this.handleOpenModalToSetting = this.handleOpenModalToSetting.bind(this);
         this.handleCloseModal = this.handleCloseModal.bind(this);
         this.handleCloseModal2 = this.handleCloseModal2.bind(this);
         this.submitFunction = this.submitFunction.bind(this);
@@ -68,7 +68,7 @@ export default class SonarIssueList extends React.PureComponent {
         this.showMoreBugList = this.showMoreBugList.bind(this);
         this.showMoreCodeSmellList = this.showMoreCodeSmellList.bind(this);
         this.showMoreVulList = this.showMoreVulList.bind(this);
-        this.ToRedmineFunction=this.ToRedmineFunction.bind(this);
+        this.ToRedmineFunction = this.ToRedmineFunction.bind(this);
     }
 
     componentDidMount() {
@@ -141,6 +141,7 @@ export default class SonarIssueList extends React.PureComponent {
     handleCloseModal() {
         this.setState({showModal: false});
     }
+
     handleCloseModal2() {
         this.setState({showModal2: false});
     }
@@ -235,7 +236,7 @@ export default class SonarIssueList extends React.PureComponent {
             <table className="data zebra">
                 <thead>
                 <tr className="code-components-header">
-                    <th className="thin nowrap text-center code-components-cell"> </th>
+                    <th className="thin nowrap text-center code-components-cell"></th>
                     <th className="thin nowrap text-center code-components-cell">Severity</th>
                     <th className="thin nowrap text-right code-components-cell">Component</th>
                     <th className="thin nowrap text-left code-components-cell">message</th>
@@ -260,8 +261,7 @@ export default class SonarIssueList extends React.PureComponent {
         )
     }
 
-    ToRedmineFunction(){
-        console.log(this.state.issue_list_tmp);
+    ToRedmineFunction() {
         let context = this.state.context;
         let hosturl = '';
         if (context[0] === undefined) {
@@ -269,23 +269,23 @@ export default class SonarIssueList extends React.PureComponent {
         } else {
             hosturl = window.location.protocol + '//' + window.location.host + context[0];
         }
-        console.log("this.state.selectUserValue : "+this.state.selectUserValue);
-        console.log("hosurl : "+hosturl);
-        console.log("this.state.issue_list_tmp.size : "+this.state.issue_list_tmp.size);
-        let issue_data=[];
-        this.state.issue_list_tmp.forEach(data => issue_data.push(data));
-        for(let data of issue_data){
-            console.log("issue_data : "+issue_data)
-            SelectedIssueToRedmine(this.props.project,data,hosturl,this.state.selectUserValue);
+        let issue_data = Array.from(this.state.issue_list_tmp);
+        //let data of issue_data
+        for (let i=0; i<issue_data.length;i++) {
+            SelectedIssueToRedmine(this.props.project, issue_data[i], hosturl, this.state.selectUserValue);
+
         }
-        this.handleCloseModal();
+        this.handleCloseModal2();
     }
 
     render() {
+
         return (
             <div className="code-components-cell">
                 <div>
-                    <button className="page-actions" onClick={this.handleOpenModalToSetting} disabled={this.state.loading}>Select ToRedmine</button>
+                    <button className="page-actions" onClick={this.handleOpenModalToSetting}
+                            disabled={this.state.loading}>Select ToRedmine
+                    </button>
                     <ReactModal
                         isOpen={this.state.showModal2}
                         style={{
@@ -297,22 +297,24 @@ export default class SonarIssueList extends React.PureComponent {
                                 marginRight: '-50%',
                                 transform: 'translate(-50%, -50%)',
                                 border: '1px solid',
-                                backgroundColor : 'white'
+                                backgroundColor: 'white'
                             }
                         }}>
                         <div>
-                           <CheckListToRedmine container={this.state.settings}
-                                               userDefault={this.state.selectUserValue}
-                                               userValue={this.updateUserValue}
-                           />
+                            <CheckListToRedmine container={this.state.settings}
+                                                userDefault={this.state.selectUserValue}
+                                                userValue={this.updateUserValue}
+                            />
                         </div>
-                        <div> </div>
+                        <div></div>
                         <button onClick={this.ToRedmineFunction}>ToRedmine</button>
                         <button onClick={this.handleCloseModal2}>Close</button>
                     </ReactModal>
                 </div>
                 <div>
-                    <button className="page-actions" onClick={this.handleOpenModal} disabled={this.state.loading}>Settings</button>
+                    <button className="page-actions" onClick={this.handleOpenModal}
+                            disabled={this.state.loading}>Settings
+                    </button>
                     <ReactModal
                         isOpen={this.state.showModal}
                         style={{
@@ -324,7 +326,7 @@ export default class SonarIssueList extends React.PureComponent {
                                 marginRight: '-50%',
                                 transform: 'translate(-50%, -50%)',
                                 border: '1px solid',
-                                backgroundColor : 'white'
+                                backgroundColor: 'white'
                             }
                         }}>
                         <div>
@@ -350,18 +352,21 @@ export default class SonarIssueList extends React.PureComponent {
                     </TabList>
                     <TabPanel>
                         {this.SeverityIssue(this.state.bug_data)}
-                        <button className="spacer-top note text-center" onClick={this.showMoreBugList}>Show More
-                        </button>
+                        <footer className="spacer-top note text-center">
+                            <a onClick={this.showMoreBugList}>Show More</a>
+                        </footer>
                     </TabPanel>
                     <TabPanel>
                         {this.SeverityIssue(this.state.code_smell_data)}
-                        <button className="spacer-top note text-center" onClick={this.showMoreCodeSmellList}>Show More
-                        </button>
+                        <footer className="spacer-top note text-center">
+                            <a onClick={this.showMoreCodeSmellList}>Show More</a>
+                        </footer>
                     </TabPanel>
                     <TabPanel>
                         {this.SeverityIssue(this.state.vulnerability_data)}
-                        <button className="spacer-top note text-center" onClick={this.showMoreVulList}>Show More
-                        </button>
+                        <footer className="spacer-top note text-center">
+                            <a onClick={this.showMoreVulList}>Show More</a>
+                        </footer>
                     </TabPanel>
                 </Tabs>
             </div>
