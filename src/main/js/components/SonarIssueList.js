@@ -20,9 +20,10 @@ import {
     settingToRedmineProject,
     settingToRedmineTracker,
     settingToRedmineUser,
-    SonarHostURL
+    SonarHostURL, TFRedmine
 } from "../api";
 import CheckListToRedmine from "./CheckListToRedmine";
+import * as promises from "react-router";
 
 const labelStyle = {
     width: "150",
@@ -54,7 +55,8 @@ export default class SonarIssueList extends React.PureComponent {
             bug_data_paging: 2,
             code_smell_paging: 2,
             vulnerability_paging: 2,
-            issue_list_tmp: new Set()
+            issue_list_tmp: new Set(),
+            requestState: null
         }
         ;
         this.handleOpenModal = this.handleOpenModal.bind(this);
@@ -121,7 +123,6 @@ export default class SonarIssueList extends React.PureComponent {
     }
 
     handleOpenModal() {
-        console.log(this.state.issue_list_tmp);
         this.setState({
             showModal: true,
             selectProjectValue: this.state.saveData[0],
@@ -134,6 +135,7 @@ export default class SonarIssueList extends React.PureComponent {
         console.log(this.state.issue_list_tmp);
         this.setState({
             showModal2: true,
+            requestState:"pending",
             selectUserValue: this.state.saveData[2]
         });
     }
@@ -231,6 +233,30 @@ export default class SonarIssueList extends React.PureComponent {
         )
     }
 
+    ToRedmineFunction() {
+        let context = this.state.context;
+        let hosturl = '';
+        if (context[0] === undefined) {
+            hosturl = window.location.protocol + '//' + window.location.host;
+        } else {
+            hosturl = window.location.protocol + '//' + window.location.host + context[0];
+        }
+        let issue_data = Array.from(this.state.issue_list_tmp);
+        let user = this.state.selectUserValue;
+        if (typeof user === "object") {
+            user = this.state.selectUserValue.id;
+        }
+        for (let i = 0; i < issue_data.length; i++) {
+            SelectedIssueToRedmine(this.props.project, issue_data[i], hosturl, user);
+            if (issue_data.length - 1 === i) {
+                this.setState({
+                    requestState:"running"
+                })
+            }
+        }
+        this.handleCloseModal2();
+    }
+
     SeverityIssue(SeveritySelect) {
         return (
             <table className="data zebra">
@@ -253,29 +279,13 @@ export default class SonarIssueList extends React.PureComponent {
                                 key={idx}
                                 context={this.state.context}
                                 issue_list_tmp={this.state.issue_list_tmp}
+                                requestState={this.state.requestState}
                             />
                     )
                     }
                     </tbody>}
             </table>
         )
-    }
-
-    ToRedmineFunction() {
-        let context = this.state.context;
-        let hosturl = '';
-        if (context[0] === undefined) {
-            hosturl = window.location.protocol + '//' + window.location.host;
-        } else {
-            hosturl = window.location.protocol + '//' + window.location.host + context[0];
-        }
-        let issue_data = Array.from(this.state.issue_list_tmp);
-        //let data of issue_data
-        for (let i=0; i<issue_data.length;i++) {
-            SelectedIssueToRedmine(this.props.project, issue_data[i], hosturl, this.state.selectUserValue);
-
-        }
-        this.handleCloseModal2();
     }
 
     render() {

@@ -30,6 +30,7 @@ export default class SonarIssueListUp extends React.PureComponent {
         this.handleCloseModalMessage = this.handleCloseModalMessage.bind(this);
         this.sonarGoIssue = this.sonarGoIssue.bind(this);
         this.onChange = this.onChange.bind(this);
+        this.fourceUpdateHandler = this.fourceUpdateHandler.bind(this);
     }
 
     componentDidMount() {
@@ -37,6 +38,25 @@ export default class SonarIssueListUp extends React.PureComponent {
             (commentData) => {
                 this.setState({commentData: commentData})
             })
+    }
+
+    componentDidUpdate(prevProps) {
+        if (this.props.requestState !== prevProps.requestState) {
+            if (this.props.requestState === "running") {
+                let issue_data = Array.from(this.props.issue_list_tmp);
+                if (issue_data.length !== 0) {
+                    if (issue_data.filter(issue_data => (issue_data.key === this.props.issue.key)).length !== 0) {
+                        this.setState({
+                            succeed: false
+                        })
+                    }
+                }
+            }
+        }
+    }
+
+    fourceUpdateHandler() {
+        this.forceUpdate();
     }
 
     onChange(e) {
@@ -49,6 +69,7 @@ export default class SonarIssueListUp extends React.PureComponent {
         }
         this.setState({temp_list_data})
     }
+
 
     TFRedmineToSend() {
         if (this.state.commentData === false) {
@@ -78,7 +99,6 @@ export default class SonarIssueListUp extends React.PureComponent {
     sonarGoIssue() {
         let context = this.props.context;
         let hosturl = '';
-        console.log("this.props.project : ", this.props.project);
         let projectkey = this.props.project.key;
         let api = '/project/issues?id=' + projectkey + '&open=' + this.props.issue.key + 'resolved=false&severities=' + this.props.issue.severity + '&types=' + this.props.issue.type;
         if (context[0] === undefined) {
@@ -113,7 +133,7 @@ export default class SonarIssueListUp extends React.PureComponent {
 
     Go_Redmine_Button() {
         this.setState({succeed: false});
-        var url;
+        let url;
         TFRedmine(this.props.issue.key).then(
             (commentData) => {
                 this.setState({

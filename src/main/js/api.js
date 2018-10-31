@@ -120,7 +120,7 @@ export function findIssueCodeSmell(project) {
     });
 }
 
-export function findIssue_NextPage(project,count,types) {
+export function findIssue_NextPage(project, count, types) {
     return getJSON('/api/issues/search', {
         p: count,
         ps: 100,
@@ -157,7 +157,7 @@ export function findIssue_NextPage(project,count,types) {
     });
 }
 
-export function findIssueCODE_SMELL_NextPage(project,count) {
+export function findIssueCODE_SMELL_NextPage(project, count) {
     return getJSON('/api/issues/search', {
         p: count,
         ps: 100,
@@ -418,7 +418,7 @@ export function IssueToRedmine(sonar_project, issue, hosturl) {
         );
 }
 
-export function SelectedIssueToRedmine(sonar_project, issue, hosturl,user) {
+export function SelectedIssueToRedmine(sonar_project, issue, hosturl, user) {
     let issuekey = issue.key;
     let issuerule = issue.rule;
     let issuemessage = issue.message;
@@ -426,7 +426,7 @@ export function SelectedIssueToRedmine(sonar_project, issue, hosturl,user) {
     let issueline = issue.line;
     let issueseverity = issue.severity;
     let issuetype = issue.type;
-    let selectToIssueUser=user;
+    let selectToIssueUser = user;
     let sonar_host_url = hosturl;
     getJSON('/api/settings/values?component=' + sonar_project.key + '&keys=sonar.redmine.hosturl,sonar.redmine.api-access-key,sonar.redmine.project-key,sonar.redmine.tracker-id')
         .then(function (sonarPredmine) {
@@ -445,37 +445,45 @@ export function SelectedIssueToRedmine(sonar_project, issue, hosturl,user) {
                         var tracker = sonarPredmine.settings[i].value;
                     }
                 }
-                axios({
-                    headers: {
-                        'X-Redmine-API-KEY': acc,
-                        'Content-Type': 'application/json'
-                    },
-                    method: 'POST',
-                    url: url + '/issues.json',
-                    transformRequest: [
-                        (data, headers) => {
-                            data = {
-                                "issue": {
-                                    "project_id": project,
-                                    "subject": issuerule + " : " + issuemessage,
-                                    "tracker_id": tracker,
-                                    "assigned_to_id": selectToIssueUser,
-                                    "description": issuerule + '\n' + issuemessage + '\n\n' + '\n\n Source Code location:\n' + issuecomponent + ' Line : ' + issueline + '\n\n' + 'check the sonarqube \n<' + sonar_host_url + '/project/issues?id=' + sonar_project.key.replace(':', '%3A') + '&open=' + issuekey + '&severities=' + issueseverity + '&types=' + issuetype + '>'
-                                }
-                            };
-                            return JSON.stringify(data)
-                        },
-                    ]
-                }).then(function (restRedmine) {
-                    if (restRedmine.status === 201) {
-                        post('/api/issues/add_comment', {
-                            issue: issuekey,
-                            text: url + '/issues/' + restRedmine.data.issue.id
-                        });
+                getJSON('/api/issues/search?issues=' + issue + '&additionalFields=comments').then(function (commentExsit) {
+                    let commentData;
+                    if (TFIssueResponse.issues[0].comments.length !== 0) {
+                        commentData = TFIssueResponse.issues[0].comments[0].markdown
+                    } else {
+                        commentData = false;
                     }
-                }).catch(error => {
-                    console.log(error.response)
-                });
+                    if (commentData) {
+                        axios({
+                            headers: {
+                                'X-Redmine-API-KEY': acc,
+                                'Content-Type': 'application/json'
+                            },
+                            method: 'POST',
+                            url: url + '/issues.json',
+                            transformRequest: [
+                                (data, headers) => {
+                                    data = {
+                                        "issue": {
+                                            "project_id": project,
+                                            "subject": issuerule + " : " + issuemessage,
+                                            "tracker_id": tracker,
+                                            "assigned_to_id": selectToIssueUser,
+                                            "description": issuerule + '\n' + issuemessage + '\n\n' + '\n\n Source Code location:\n' + issuecomponent + ' Line : ' + issueline + '\n\n' + 'check the sonarqube \n<' + sonar_host_url + '/project/issues?id=' + sonar_project.key.replace(':', '%3A') + '&open=' + issuekey + '&severities=' + issueseverity + '&types=' + issuetype + '>'
+                                        }
+                                    };
+                                    return JSON.stringify(data)
+                                },
+                            ]
+                        }).then(function (restRedmine) {
+                            if (restRedmine.status === 201) {
+                                post('/api/issues/add_comment', {
+                                    issue: issuekey,
+                                    text: url + '/issues/' + restRedmine.data.issue.id
+                                });
+                            }
+                        })
+                    }
+                })
             }
         );
 }
