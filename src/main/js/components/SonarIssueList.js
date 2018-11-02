@@ -57,6 +57,7 @@ export default class SonarIssueList extends React.PureComponent {
             vulnerability_paging: 2,
             issue_list_tmp: new Set(),
             requestState: null
+
         }
         ;
         this.handleOpenModal = this.handleOpenModal.bind(this);
@@ -135,7 +136,7 @@ export default class SonarIssueList extends React.PureComponent {
         console.log(this.state.issue_list_tmp);
         this.setState({
             showModal2: true,
-            requestState:"pending",
+            requestState: "pending",
             selectUserValue: this.state.saveData[2]
         });
     }
@@ -250,7 +251,7 @@ export default class SonarIssueList extends React.PureComponent {
             SelectedIssueToRedmine(this.props.project, issue_data[i], hosturl, user);
             if (issue_data.length - 1 === i) {
                 this.setState({
-                    requestState:"running"
+                    requestState: "running"
                 })
             }
         }
@@ -258,11 +259,12 @@ export default class SonarIssueList extends React.PureComponent {
     }
 
     SeverityIssue(SeveritySelect) {
+        let checkCount=this.state.issue_list_tmp.size;
         return (
             <table className="data zebra">
                 <thead>
                 <tr className="code-components-header">
-                    <th className="thin nowrap text-center code-components-cell"></th>
+                    <th className="thin nowrap text-center code-components-cell">Count : {checkCount}</th>
                     <th className="thin nowrap text-center code-components-cell">Severity</th>
                     <th className="thin nowrap text-right code-components-cell">Component</th>
                     <th className="thin nowrap text-left code-components-cell">message</th>
@@ -289,7 +291,6 @@ export default class SonarIssueList extends React.PureComponent {
     }
 
     render() {
-
         return (
             <div className="code-components-cell">
                 <div>
@@ -316,7 +317,6 @@ export default class SonarIssueList extends React.PureComponent {
                                                 userValue={this.updateUserValue}
                             />
                         </div>
-                        <div></div>
                         <button onClick={this.ToRedmineFunction}>ToRedmine</button>
                         <button onClick={this.handleCloseModal2}>Close</button>
                     </ReactModal>

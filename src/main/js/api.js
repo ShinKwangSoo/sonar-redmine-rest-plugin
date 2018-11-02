@@ -446,13 +446,8 @@ export function SelectedIssueToRedmine(sonar_project, issue, hosturl, user) {
                     }
                 }
                 getJSON('/api/issues/search?issues=' + issue + '&additionalFields=comments').then(function (commentExsit) {
-                    let commentData;
-                    if (TFIssueResponse.issues[0].comments.length !== 0) {
-                        commentData = TFIssueResponse.issues[0].comments[0].markdown
-                    } else {
-                        commentData = false;
-                    }
-                    if (commentData) {
+                    console.log(commentExsit.issues.length);
+                    if (commentExsit.issues.length === 0) {
                         axios({
                             headers: {
                                 'X-Redmine-API-KEY': acc,
