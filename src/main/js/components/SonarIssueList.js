@@ -23,7 +23,6 @@ import {
     SonarHostURL, TFRedmine
 } from "../api";
 import CheckListToRedmine from "./CheckListToRedmine";
-import * as promises from "react-router";
 
 const labelStyle = {
     width: "150",

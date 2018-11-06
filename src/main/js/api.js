@@ -226,7 +226,7 @@ export function RedmineSettingsAPI() {
                     name: ''
                 };
                 projects.name = RedmineProjectInfo.data.projects[i].name;
-                projectData[number] = projects
+                projectData[number] = projects;
                 number++;
             }
             settingData[0] = projectData;
@@ -246,7 +246,7 @@ export function RedmineSettingsAPI() {
                     name: ''
                 };
                 trackers.name = RedmineTrackerInfo.data.trackers[i].name;
-                trackerData[number] = trackers
+                trackerData[number] = trackers;
                 number++;
             }
             settingData[1] = trackerData;
@@ -269,7 +269,7 @@ export function RedmineSettingsAPI() {
                 };
                 users.firstname = RedmineUserInfo.data.users[i].firstname;
                 users.lastname = RedmineUserInfo.data.users[i].lastname;
-                userData[number] = users
+                userData[number] = users;
                 number++;
             }
             settingData[2] = userData;
@@ -308,12 +308,11 @@ export function saveSettingToRedmine(project) {
             url: url + '/projects/' + project + '.json'
         }).then(function (RedmineProjectInfo) {
             if (RedmineProjectInfo.data.project != null) {
-                let projects = {
+                saveSettingsData[0] = {
                     id: RedmineProjectInfo.data.project.identifier,
                     value: RedmineProjectInfo.data.project.name,
                     label: RedmineProjectInfo.data.project.name
                 };
-                saveSettingsData[0] = projects;
             }
         });
         axios({
@@ -326,12 +325,11 @@ export function saveSettingToRedmine(project) {
         }).then(function (RedmineTrackerInfo) {
             for (let i = 0; i < RedmineTrackerInfo.data.project.trackers.length; i++) {
                 if (RedmineTrackerInfo.data.project.trackers[i].id == parseInt(tracker)) {
-                    let trackers = {
+                    saveSettingsData[1] = {
                         id: RedmineTrackerInfo.data.project.trackers[i].id,
                         value: RedmineTrackerInfo.data.project.trackers[i].name,
                         label: RedmineTrackerInfo.data.project.trackers[i].name
-                    };
-                    saveSettingsData[1] = trackers
+                    }
                 }
             }
         });
@@ -343,12 +341,11 @@ export function saveSettingToRedmine(project) {
             method: 'get',
             url: url + '/users/' + user + '.json'
         }).then(function (RedmineUserInfo) {
-            let users = {
+            saveSettingsData[2] = {
                 id: RedmineUserInfo.data.user.id,
                 value: RedmineUserInfo.data.user.firstname,
                 label: RedmineUserInfo.data.user.firstname
             };
-            saveSettingsData[2] = users;
         });
         return saveSettingsData;
     });
@@ -501,9 +498,11 @@ export function ruleDataRestAPI(rulekey) {
         let ruledata = {
             name: '',
             htmlDesc: ''
-        }
+        };
         ruledata.name = ruleResponseData.rule.name;
         ruledata.htmlDesc = ruleResponseData.rule.htmlDesc;
+        console.log("response rules Data : ", ruleResponseData);
+        console.log("send Rules Data : ", ruledata);
         return ruledata
     })
 }
@@ -511,7 +510,7 @@ export function ruleDataRestAPI(rulekey) {
 export function SonarHostURL() {
     return getJSON('/api/system/info').then(function (responseSettingData) {
         let contextData = [];
-        if (responseSettingData.staus != 200 || responseSettingData.staus != 201) {
+        if (responseSettingData.staus !== 200 || responseSettingData.staus !== 201) {
             const ArraySystem = Object.keys(responseSettingData.Settings).reduce(function (out, key) {
                 out.push({
                     key: key,
@@ -520,7 +519,7 @@ export function SonarHostURL() {
                 return out;
             }, []);
             for (let i = 0; i < ArraySystem.length; i++) {
-                if (ArraySystem[i].key == "sonar.web.context") {
+                if (ArraySystem[i].key === "sonar.web.context") {
                     contextData[0] = ArraySystem[i].value;
                 }
             }
@@ -540,4 +539,21 @@ export function settingToRedmineTracker(project, redmine_trackerid) {
 
 export function settingToRedmineUser(project, redmine_userid) {
     post('/api/settings/set', {component: project.key, key: 'sonar.redmine.user-id', value: redmine_userid});
+}
+
+export function SonarSourceView(fileKey) {
+    return getJSON('/api/sources/show?from=1&key=' + fileKey).then(function (sonarSource) {
+        let sonarData=[];
+        for(let i=0;i<sonarSource.sources.length; i++){
+            let sonarSourceView = {
+                number:'',
+                htmlDesc: ''
+            };
+            sonarSourceView.number=sonarSource.sources[i][0];
+            sonarSourceView.htmlDesc=sonarSource.sources[i][1];
+            sonarData[i]=sonarSourceView
+        }
+        console.log("response sonarSourceData : ", sonarData);
+        return sonarData;
+    })
 }

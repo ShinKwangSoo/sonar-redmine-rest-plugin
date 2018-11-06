@@ -5,11 +5,10 @@
  */
 import React from 'react';
 import ReactTooltip from 'react-tooltip'
-import {IssueToRedmine, TFRedmine, ruleDataRestAPI} from "../api";
+import {IssueToRedmine, TFRedmine, ruleDataRestAPI, SonarSourceView,} from "../api";
 import ReactModal from 'react-modal';
 import Checkbox from 'rc-checkbox';
 import 'rc-checkbox/assets/index.css';
-import Iframe from 'react-iframe'
 
 export default class SonarIssueListUp extends React.PureComponent {
     constructor(props) {
@@ -22,7 +21,8 @@ export default class SonarIssueListUp extends React.PureComponent {
             isOpenMessage: false,
             disabled: false,
             showModalComponent: false,
-            hosturl: ''
+            hosturl: '',
+            sourceData: ''
         };
         this.simplification = this.simplification.bind(this);
         this.TFRedmineToSend = this.TFRedmineToSend.bind(this);
@@ -31,9 +31,10 @@ export default class SonarIssueListUp extends React.PureComponent {
         this.Go_Redmine_Button = this.Go_Redmine_Button.bind(this);
         this.handleOpenModalMessage = this.handleOpenModalMessage.bind(this);
         this.handleCloseModalMessage = this.handleCloseModalMessage.bind(this);
-        this.sonarGoIssue = this.sonarGoIssue.bind(this);
         this.onChange = this.onChange.bind(this);
+        this.handleOpenModalComponent = this.handleOpenModalComponent.bind(this);
         this.handleCloseModalComponent = this.handleCloseModalComponent.bind(this);
+        this.SonarSource = this.SonarSource.bind(this);
     }
 
     componentDidMount() {
@@ -97,22 +98,13 @@ export default class SonarIssueListUp extends React.PureComponent {
         }
     }
 
-    sonarGoIssue(key) {
-        this.setState({
-            showModalComponent: true
+    handleOpenModalComponent(component) {
+        SonarSourceView(component).then((sourceData) => {
+            this.setState({
+                sourceData: sourceData,
+                showModalComponent: true
+            });
         });
-        let context = this.props.context;
-        let projectkey = this.props.project.key;
-        let api = '/project/issues?id=' + projectkey + '&open=' + key + '&severities=' + this.props.issue.severity + '&types=' + this.props.issue.type;
-        if (context[0] === undefined) {
-            this.setState({
-                hosturl: window.location.protocol + '//' + window.location.host + api
-            })
-        } else {
-            this.setState({
-                hosturl: window.location.protocol + '//' + window.location.host + context[0] + api
-            })
-        }
     }
 
     handleClick() {
@@ -166,6 +158,28 @@ export default class SonarIssueListUp extends React.PureComponent {
             </span>);
     }
 
+    SonarSource() {
+        let table = [];
+        let children = [];
+        for (let i = 0; i < this.state.sourceData.length; i++) {
+            children.push(
+                <tr>
+                    <td>
+                        {console.log(this.state.sourceData.number[i])}
+                        <div className="thin nowrap text-right">{this.state.sourceData.number[i]}</div>
+                    </td>
+                    <td className="thin nowrap text-left">
+                        {console.log(this.state.sourceData.htmlDesc[i])}
+                        <div className="coding-rules-detail-description rule-desc markdown"
+                             dangerouslySetInnerHTML={{__html: this.state.sourceData.htmlDesc[i] || ''}}></div>
+                    </td>
+                </tr>
+            );
+            table.push(children)
+        }
+        return table
+    }
+
     simplification = (line, maxLength) => {
         if (line === null || line.length <= maxLength) return line;
         else return line.substring(0, maxLength) + ('...')
@@ -204,7 +218,7 @@ export default class SonarIssueListUp extends React.PureComponent {
                     <div className="code-components-cell" data-for={this.props.issue.key} data-tip>
                         <span><a href='#' onClick={event => {
                             event.preventDefault();
-                            this.sonarGoIssue(this.props.issue.key)
+                            this.handleOpenModalComponent(this.props.issue.component)
                         }}>{this.simplificationlast(this.props.issue.component, Math.ceil(this.props.issue.component.length / 4))}</a></span>
                         <ReactTooltip id={this.props.issue.key} getContent={[() => {
                             return this.props.issue.component
@@ -216,7 +230,7 @@ export default class SonarIssueListUp extends React.PureComponent {
                                         content: {
                                             position: '',
                                             top: '50%',
-                                            left: '90%',
+                                            left: '70%',
                                             right: '50%',
                                             bottom: 'auto',
                                             marginRight: '-50%',
@@ -228,13 +242,17 @@ export default class SonarIssueListUp extends React.PureComponent {
                                         }
                                     }}>
                             <div>
-                                <Iframe url={this.state.hosturl}
-                                        position="absolute"
-                                        width="100%"
-                                        id={this.props.issue.key}
-                                        height="100%"
-                                        styles={{height: "100%"}}
-                                        allowFullScreen/>
+                                <table>
+                                    <thead>
+                                    <th className="thin nowrap text-left">
+                                        <div className="workspace-viewer-header">
+                                            {this.props.issue.component}</div>
+                                    </th>
+                                    </thead>
+                                    <tbody>
+                                    {this.SonarSource()}
+                                    </tbody>
+                                </table>
                             </div>
                         </ReactModal>
                     </div>
@@ -248,6 +266,8 @@ export default class SonarIssueListUp extends React.PureComponent {
                                  }}>{this.simplification(this.props.issue.message, 30)}</a></span>
                         <ReactModal
                             isOpen={this.state.showModalMessage}
+                            onRequestClose={this.handleCloseModalMessage}
+                            shouldCloseOnOverlayClick={true}
                             style={{
                                 content: {
                                     top: '50%',
@@ -277,7 +297,6 @@ export default class SonarIssueListUp extends React.PureComponent {
                                             <div className="coding-rules-detail-description rule-desc markdown"
                                                  dangerouslySetInnerHTML={{__html: this.state.ruleData.htmlDesc || ''}}>
                                             </div>
-
                                         </th>
                                     </tr>
                                     </tbody>
