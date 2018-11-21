@@ -20,16 +20,10 @@ import {
     settingToRedmineProject,
     settingToRedmineTracker,
     settingToRedmineUser,
-    SonarHostURL, TFRedmine
+    SonarHostURL
 } from "../api";
+import '../common/SonarRedmine.css'
 import CheckListToRedmine from "./CheckListToRedmine";
-
-const labelStyle = {
-    width: "150",
-    height: "10",
-    minWidth: "10",
-
-};
 
 export default class SonarIssueList extends React.PureComponent {
     constructor(props) {
@@ -74,6 +68,7 @@ export default class SonarIssueList extends React.PureComponent {
     }
 
     componentDidMount() {
+        console.log("react version : ", React.version);
         findIssueBug(this.props.project).then(
             (valuesReturnedByAPI) => {
                 this.setState({
@@ -250,7 +245,7 @@ export default class SonarIssueList extends React.PureComponent {
             SelectedIssueToRedmine(this.props.project, issue_data[i], hosturl, user);
             if (issue_data.length - 1 === i) {
                 this.setState({
-                    requestState: "running"
+                    requestState: "running",
                 })
             }
         }
@@ -258,16 +253,16 @@ export default class SonarIssueList extends React.PureComponent {
     }
 
     SeverityIssue(SeveritySelect) {
-        let checkCount=this.state.issue_list_tmp.size;
         return (
-            <table className="data zebra">
+            <table className="data zebra" >
                 <thead>
                 <tr className="code-components-header">
-                    <th className="thin nowrap text-center code-components-cell">Count : {checkCount}</th>
-                    <th className="thin nowrap text-center code-components-cell">Severity</th>
-                    <th className="thin nowrap text-right code-components-cell">Component</th>
-                    <th className="thin nowrap text-left code-components-cell">message</th>
-                    <th className="thin nowrap text-center">To Redmine</th>
+                    <th className="code-components-cell check-box-font-size"/>
+                    <th className="nowrap text-center code-components-cell">Severity</th>
+                    <th className="nowrap text-right code-components-cell">Component</th>
+                    <th className="nowrap text-right code-components-cell">Author</th>
+                    <th className="nowrap text-left code-components-cell">message</th>
+                    <th className="nowrap text-center">To Redmine</th>
                 </tr>
                 </thead>
                 {
@@ -314,6 +309,7 @@ export default class SonarIssueList extends React.PureComponent {
                             <CheckListToRedmine container={this.state.settings}
                                                 userDefault={this.state.selectUserValue}
                                                 userValue={this.updateUserValue}
+                                                issue_list_tmp={this.state.issue_list_tmp}
                             />
                         </div>
                         <button onClick={this.ToRedmineFunction}>ToRedmine</button>

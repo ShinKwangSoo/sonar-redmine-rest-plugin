@@ -5,10 +5,16 @@
  */
 import React from 'react';
 import ReactTooltip from 'react-tooltip'
-import {IssueToRedmine, TFRedmine, ruleDataRestAPI, SonarSourceView,} from "../api";
+import {
+    IssueToRedmine,
+    TFRedmine,
+    ruleDataRestAPI, SonarSourceViewAPI, SonarSourceDataMoreLoad,
+} from "../api";
+import SonarSourceViewModal from "./SonarSourceViewModal";
 import ReactModal from 'react-modal';
 import Checkbox from 'rc-checkbox';
 import 'rc-checkbox/assets/index.css';
+import '../common/SonarRedmine.css'
 
 export default class SonarIssueListUp extends React.PureComponent {
     constructor(props) {
@@ -19,10 +25,11 @@ export default class SonarIssueListUp extends React.PureComponent {
             ruleData: '',
             showModalMessage: false,
             isOpenMessage: false,
-            disabled: false,
+            checkTF: false,
             showModalComponent: false,
             hosturl: '',
-            sourceData: ''
+            sourceData: '',
+            sourceDataMore: 2001
         };
         this.simplification = this.simplification.bind(this);
         this.TFRedmineToSend = this.TFRedmineToSend.bind(this);
@@ -34,7 +41,7 @@ export default class SonarIssueListUp extends React.PureComponent {
         this.onChange = this.onChange.bind(this);
         this.handleOpenModalComponent = this.handleOpenModalComponent.bind(this);
         this.handleCloseModalComponent = this.handleCloseModalComponent.bind(this);
-        this.SonarSource = this.SonarSource.bind(this);
+        this.LoadMoreCode = this.LoadMoreCode.bind(this);
     }
 
     componentDidMount() {
@@ -51,8 +58,9 @@ export default class SonarIssueListUp extends React.PureComponent {
                 if (issue_data.length !== 0) {
                     if (issue_data.filter(issue_data => (issue_data.key === this.props.issue.key)).length !== 0) {
                         this.setState({
-                            succeed: false
-                        })
+                            succeed: false,
+                            checkTF: false
+                        });
                     }
                 }
             }
@@ -62,9 +70,17 @@ export default class SonarIssueListUp extends React.PureComponent {
     onChange(e) {
         console.log(e.target.name);
         let temp_list_data = this.props.issue_list_tmp;
+        console.log("e : ", e);
+        console.log("e.target : ", e.target);
         if (e.target.checked) {
-            temp_list_data.add(e.target.name)
+            temp_list_data.add(e.target.name);
+            this.setState({
+                checkTF: e.target.checked
+            });
         } else {
+            this.setState({
+                checkTF: e.target.checked
+            });
             temp_list_data.delete(e.target.name)
         }
         this.setState({
@@ -98,13 +114,25 @@ export default class SonarIssueListUp extends React.PureComponent {
         }
     }
 
-    handleOpenModalComponent(component) {
-        SonarSourceView(component).then((sourceData) => {
-            this.setState({
-                sourceData: sourceData,
-                showModalComponent: true
+    handleOpenModalComponent(component, e) {
+        SonarSourceViewAPI(component).then(
+            (sourceData) => {
+                this.setState({
+                    sourceData: sourceData,
+                    showModalComponent: true
+                });
             });
-        });
+    }
+
+    LoadMoreCode() {
+        SonarSourceDataMoreLoad(this.props.issue.component, this.state.sourceDataMore).then(
+            (valuesReturnedByAPI) => {
+                this.setState({
+                    sourceData: this.state.sourceData.concat(valuesReturnedByAPI),
+                    sourceDataMore: this.state.sourceDataMore + 2000
+                });
+            }
+        );
     }
 
     handleClick() {
@@ -137,14 +165,13 @@ export default class SonarIssueListUp extends React.PureComponent {
     Go_Redmine_Button() {
         this.setState({succeed: false});
         let url;
-        TFRedmine(this.props.issue.key).then(
-            (commentData) => {
-                this.setState({
-                    commentData: commentData
-                });
-                url = this.state.commentData;
-                window.open(url)
+        TFRedmine(this.props.issue.key).then((commentData) => {
+            this.setState({
+                commentData: commentData
             });
+            url = this.state.commentData;
+            window.open(url)
+        });
     }
 
     Go_Redmine() {
@@ -158,27 +185,6 @@ export default class SonarIssueListUp extends React.PureComponent {
             </span>);
     }
 
-    SonarSource() {
-        let table = [];
-        let children = [];
-        for (let i = 0; i < this.state.sourceData.length; i++) {
-            children.push(
-                <tr>
-                    <td>
-                        {console.log(this.state.sourceData.number[i])}
-                        <div className="thin nowrap text-right">{this.state.sourceData.number[i]}</div>
-                    </td>
-                    <td className="thin nowrap text-left">
-                        {console.log(this.state.sourceData.htmlDesc[i])}
-                        <div className="coding-rules-detail-description rule-desc markdown"
-                             dangerouslySetInnerHTML={{__html: this.state.sourceData.htmlDesc[i] || ''}}></div>
-                    </td>
-                </tr>
-            );
-            table.push(children)
-        }
-        return table
-    }
 
     simplification = (line, maxLength) => {
         if (line === null || line.length <= maxLength) return line;
@@ -197,28 +203,29 @@ export default class SonarIssueListUp extends React.PureComponent {
         const notsucceed = (
             this.Go_Redmine()
         );
+
         return (
             <tr>
-                <td>
+                <td className="nowrap text-right code-components-cell check-box-font-size">
                     <span>
                     <label>
                         <Checkbox
                             className="center-pill"
                             name={this.props.issue}
+                            checked={this.state.checkTF}
                             onChange={(e) => this.onChange(e)}
-                            disabled={this.state.disabled}
                         />
                     </label>
                     </span>
                 </td>
-                <td className="thin nowrap text-center">
+                <td className="nowrap text-center">
                     <div className="code-components-cell"><span>{this.props.issue.severity}</span></div>
                 </td>
-                <td className="thin nowrap text-right">
+                <td className="nowrap text-right">
                     <div className="code-components-cell" data-for={this.props.issue.key} data-tip>
-                        <span><a href='#' onClick={event => {
-                            event.preventDefault();
-                            this.handleOpenModalComponent(this.props.issue.component)
+                        <span><a href='#' onClick={e => {
+                            e.preventDefault();
+                            this.handleOpenModalComponent(this.props.issue.component, e)
                         }}>{this.simplificationlast(this.props.issue.component, Math.ceil(this.props.issue.component.length / 4))}</a></span>
                         <ReactTooltip id={this.props.issue.key} getContent={[() => {
                             return this.props.issue.component
@@ -242,27 +249,21 @@ export default class SonarIssueListUp extends React.PureComponent {
                                         }
                                     }}>
                             <div>
-                                <table>
-                                    <thead>
-                                    <th className="thin nowrap text-left">
-                                        <div className="workspace-viewer-header">
-                                            {this.props.issue.component}</div>
-                                    </th>
-                                    </thead>
-                                    <tbody>
-                                    {this.SonarSource()}
-                                    </tbody>
-                                </table>
+                                <SonarSourceViewModal issue={this.props.issue}
+                                                      sourceData={this.state.sourceData}
+                                                      LoadMoreCode={this.LoadMoreCode}
+                                                      handleOpenModalMessage={this.handleOpenModalMessage}
+                                />
                             </div>
                         </ReactModal>
                     </div>
                 </td>
-                <td className="thin nowrap text-left">
+                <td className="nowrap text-left">
                     <div>
                         <span><a href='#'
-                                 onClick={event => {
-                                     event.preventDefault();
-                                     this.handleOpenModalMessage(this.props.issue.rule)
+                                 onClick={e => {
+                                     e.preventDefault();
+                                     this.handleOpenModalMessage(this.props.issue.rule, e)
                                  }}>{this.simplification(this.props.issue.message, 30)}</a></span>
                         <ReactModal
                             isOpen={this.state.showModalMessage}
@@ -286,14 +287,17 @@ export default class SonarIssueListUp extends React.PureComponent {
                             <div>
                                 <table>
                                     <thead>
-                                    <th className="thin nowrap text-left">
+                                    <tr>
+                                        <div className="rule-message">{this.props.issue.message}</div>
+                                    </tr>
+                                    <tr className="nowrap text-left">
                                         <div className="workspace-viewer-header">
                                             {this.state.ruleData.name}</div>
-                                    </th>
+                                    </tr>
                                     </thead>
                                     <tbody>
                                     <tr>
-                                        <th className="thin nowrap text-left">
+                                        <th className="nowrap text-left">
                                             <div className="coding-rules-detail-description rule-desc markdown"
                                                  dangerouslySetInnerHTML={{__html: this.state.ruleData.htmlDesc || ''}}>
                                             </div>
@@ -306,7 +310,7 @@ export default class SonarIssueListUp extends React.PureComponent {
                         </ReactModal>
                     </div>
                 </td>
-                <td className="thin nowrap text-center">
+                <td className="nowrap text-center">
                     <div className="code-components-cell" onClick={this.handleClick.bind(this)}>
                         {this.state.succeed ? succeed : notsucceed}
                     </div>

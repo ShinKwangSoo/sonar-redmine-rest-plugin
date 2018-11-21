@@ -541,19 +541,116 @@ export function settingToRedmineUser(project, redmine_userid) {
     post('/api/settings/set', {component: project.key, key: 'sonar.redmine.user-id', value: redmine_userid});
 }
 
-export function SonarSourceView(fileKey) {
-    return getJSON('/api/sources/show?from=1&key=' + fileKey).then(function (sonarSource) {
-        let sonarData=[];
-        for(let i=0;i<sonarSource.sources.length; i++){
-            let sonarSourceView = {
-                number:'',
-                htmlDesc: ''
-            };
-            sonarSourceView.number=sonarSource.sources[i][0];
-            sonarSourceView.htmlDesc=sonarSource.sources[i][1];
-            sonarData[i]=sonarSourceView
-        }
-        console.log("response sonarSourceData : ", sonarData);
-        return sonarData;
-    })
+export function SonarSourceViewAPI(fileKey) {
+    let regex = RegExp('\\w+@', 'i');
+    let regexReplace = /@/i;
+    let sonarScmData = [];
+    let sonarData = [];
+    return getJSON('/api/sources/show?from=1&key=' + fileKey).then(function(sonarSourceTotalLength){
+       if(sonarSourceTotalLength.total<2000){
+           return getJSON('/api/sources/scm?from=1&key=' + fileKey).then(function (sonarSourceSCM){
+           for (let i = 0; i < sonarSourceSCM.scm.length; i++) {
+               let sonarSourceSCMView = {
+                   number: '',
+                   name: ''
+               };
+               sonarSourceSCMView.number = sonarSourceSCM.scm[i][0];
+               sonarSourceSCMView.name = regexReplace[Symbol.replace](regex.exec(sonarSourceSCM.scm[i][1]), '');
+               sonarScmData[i] = sonarSourceSCMView
+           }
+           for (let i = 0; i < sonarSourceTotalLength.sources.length; i++) {
+               let sonarSourceView = {
+                   number: '',
+                   htmlDesc: '',
+                   committer: ''
+               };
+               sonarSourceView.number = sonarSourceTotalLength.sources[i][0];
+               sonarSourceView.htmlDesc = sonarSourceTotalLength.sources[i][1];
+               for (let j = 0; j < sonarScmData.length; j++) {
+                   if (sonarSourceView.number <= sonarScmData[j].number) {
+                       if (sonarSourceView.number === sonarScmData[j].number) {
+                           sonarSourceView.committer = sonarScmData[j].name
+                       }
+                   }
+               }
+               sonarData[i] = sonarSourceView;
+           }
+           console.log("response SonarSourceData : ", sonarData);
+           return sonarData;
+           });
+       } else {
+           return getJSON('/api/sources/show?from=1&key=' + fileKey + '&to=2000').then(function (sonarSource) {
+               return getJSON('/api/sources/scm?from=1&key=' + fileKey + '&to=2000').then(function (sonarSourceSCM) {
+                   for (let i = 0; i < sonarSourceSCM.scm.length; i++) {
+                       let sonarSourceSCMView = {
+                           number: '',
+                           name: ''
+                       };
+                       sonarSourceSCMView.number = sonarSourceSCM.scm[i][0];
+                       sonarSourceSCMView.name = regexReplace[Symbol.replace](regex.exec(sonarSourceSCM.scm[i][1]), '');
+                       sonarScmData[i] = sonarSourceSCMView
+                   }
+                   for (let i = 0; i < sonarSource.sources.length; i++) {
+                       let sonarSourceView = {
+                           number: '',
+                           htmlDesc: '',
+                           committer: ''
+                       };
+                       sonarSourceView.number = sonarSource.sources[i][0];
+                       sonarSourceView.htmlDesc = sonarSource.sources[i][1];
+                       for (let j = 0; j < sonarScmData.length; j++) {
+                           if (sonarSourceView.number <= sonarScmData[j].number) {
+                               if (sonarSourceView.number === sonarScmData[j].number) {
+                                   sonarSourceView.committer = sonarScmData[j].name
+                               }
+                           }
+                       }
+                       sonarData[i] = sonarSourceView;
+                   }
+                   console.log("response SonarSourceData : ", sonarData);
+                   return sonarData;
+               });
+           });
+       }
+    });
+}
+
+export function SonarSourceDataMoreLoad(fileKey, from) {
+    let sonarData = [];
+    let regex = RegExp('\\w+@', 'i');
+    let regexReplace = /@/i;
+    let sonarScmData = [];
+    return getJSON('/api/sources/show?key=' + fileKey + "&from=" + from + "&to=" + from + 2000).then(function (sonarSource) {
+        return getJSON('/api/sources/scm?key=' + fileKey + "&from=" + from + "&to=" + from + 2000).then(function (sonarSourceSCM) {
+            for (let i = 0; i < sonarSourceSCM.scm.length; i++) {
+                let sonarSourceSCMView = {
+                    number: '',
+                    name: ''
+                };
+                sonarSourceSCMView.number = sonarSourceSCM.scm[i][0];
+                sonarSourceSCMView.name = regexReplace[Symbol.replace](regex.exec(sonarSourceSCM.scm[i][1]), '');
+                sonarScmData[i] = sonarSourceSCMView
+            }
+            for (let i = 0; i < sonarSource.sources.length; i++) {
+                let sonarSourceView = {
+                    number: '',
+                    htmlDesc: '',
+                    committer: ''
+                };
+                sonarSourceView.number = sonarSource.sources[i][0];
+                sonarSourceView.htmlDesc = sonarSource.sources[i][1];
+                for (let j = 0; j < sonarScmData.length; j++) {
+                    if (sonarSourceView.number <= sonarScmData[j].number) {
+                        if (sonarSourceView.number === sonarScmData[j].number) {
+                            sonarSourceView.committer = sonarScmData[j].name
+                        }
+                    }
+                }
+                sonarData[i] = sonarSourceView
+            }
+            console.log("response SonarSourceDataMoreLoad : ", sonarData);
+            return sonarData;
+        });
+    });
+
 }
