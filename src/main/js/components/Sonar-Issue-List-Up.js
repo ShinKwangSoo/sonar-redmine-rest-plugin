@@ -70,8 +70,6 @@ export default class SonarIssueListUp extends React.PureComponent {
     onChange(e) {
         console.log(e.target.name);
         let temp_list_data = this.props.issue_list_tmp;
-        console.log("e : ", e);
-        console.log("e.target : ", e.target);
         if (e.target.checked) {
             temp_list_data.add(e.target.name);
             this.setState({
@@ -114,12 +112,12 @@ export default class SonarIssueListUp extends React.PureComponent {
         }
     }
 
-    handleOpenModalComponent(component, e) {
+    handleOpenModalComponent(component) {
         SonarSourceViewAPI(component).then(
             (sourceData) => {
                 this.setState({
                     sourceData: sourceData,
-                    showModalComponent: true
+                    showModalComponent: true,
                 });
             });
     }
@@ -226,9 +224,9 @@ export default class SonarIssueListUp extends React.PureComponent {
                         <span><a href='#' onClick={e => {
                             e.preventDefault();
                             this.handleOpenModalComponent(this.props.issue.component, e)
-                        }}>{this.simplificationlast(this.props.issue.component, Math.ceil(this.props.issue.component.length / 4))}</a></span>
+                        }}>{this.simplificationlast(this.props.issue.component+' : '+this.props.issue.line, Math.ceil(this.props.issue.component.length / 4))}</a></span>
                         <ReactTooltip id={this.props.issue.key} getContent={[() => {
-                            return this.props.issue.component
+                            return this.props.issue.component+' : '+this.props.issue.line
                         }]}/>
                         <ReactModal isOpen={this.state.showModalComponent}
                                     onRequestClose={this.handleCloseModalComponent}
@@ -251,13 +249,19 @@ export default class SonarIssueListUp extends React.PureComponent {
                             <div>
                                 <SonarSourceViewModal issue={this.props.issue}
                                                       sourceData={this.state.sourceData}
+                                                      sourceDataMore={this.state.sourceDataMore}
                                                       LoadMoreCode={this.LoadMoreCode}
                                                       handleOpenModalMessage={this.handleOpenModalMessage}
+                                                      handleCloseModalComponent={this.handleCloseModalComponent}
                                 />
                             </div>
                         </ReactModal>
                     </div>
                 </td>
+                <td className="nowrap text-left">
+                    <div className="code-components-cell"><span>{this.props.issue.author}</span></div>
+                </td>
+
                 <td className="nowrap text-left">
                     <div>
                         <span><a href='#'

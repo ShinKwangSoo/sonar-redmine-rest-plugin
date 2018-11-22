@@ -29,6 +29,7 @@ export function findIssueBug(project) {
                     line: "",
                     message: "",
                     type: "",
+                    author:""
                 };
                 result.component = response.issues[i].component;
                 result.line = response.issues[i].line;
@@ -36,6 +37,7 @@ export function findIssueBug(project) {
                 result.rule = response.issues[i].rule;
                 result.severity = response.issues[i].severity;
                 result.type = response.issues[i].type;
+                result.author=response.issues[i].author;
                 data[numberOfIssue] = result;
                 numberOfIssue++;
             }
@@ -66,7 +68,8 @@ export function findIssueVULNERABILITY(project) {
                     component: "",
                     line: "",
                     message: "",
-                    type: ""
+                    type: "",
+                    author:""
                 };
                 result.component = response.issues[i].component;
                 result.line = response.issues[i].line;
@@ -74,6 +77,7 @@ export function findIssueVULNERABILITY(project) {
                 result.rule = response.issues[i].rule;
                 result.severity = response.issues[i].severity;
                 result.type = response.issues[i].type;
+                result.author=response.issues[i].author;
                 data[numberOfIssue] = result;
                 numberOfIssue++;
             }
@@ -104,7 +108,8 @@ export function findIssueCodeSmell(project) {
                     component: "",
                     line: "",
                     message: "",
-                    type: ""
+                    type: "",
+                    author:""
                 };
                 result.component = response.issues[i].component;
                 result.line = response.issues[i].line;
@@ -112,6 +117,7 @@ export function findIssueCodeSmell(project) {
                 result.rule = response.issues[i].rule;
                 result.severity = response.issues[i].severity;
                 result.type = response.issues[i].type;
+                result.author=response.issues[i].author;
                 data[numberOfIssue] = result;
                 numberOfIssue++;
             }
@@ -141,7 +147,8 @@ export function findIssue_NextPage(project, count, types) {
                     component: "",
                     line: "",
                     message: "",
-                    type: ""
+                    type: "",
+                    author:""
                 };
                 result.component = response.issues[i].component;
                 result.line = response.issues[i].line;
@@ -149,6 +156,7 @@ export function findIssue_NextPage(project, count, types) {
                 result.rule = response.issues[i].rule;
                 result.severity = response.issues[i].severity;
                 result.type = response.issues[i].type;
+                result.author=response.issues[i].author;
                 data[numberOfIssue] = result;
                 numberOfIssue++;
             }
@@ -178,7 +186,8 @@ export function findIssueCODE_SMELL_NextPage(project, count) {
                     component: "",
                     line: "",
                     message: "",
-                    type: ""
+                    type: "",
+                    author:""
                 };
                 result.component = response.issues[i].component;
                 result.line = response.issues[i].line;
@@ -443,7 +452,6 @@ export function SelectedIssueToRedmine(sonar_project, issue, hosturl, user) {
                     }
                 }
                 getJSON('/api/issues/search?issues=' + issue + '&additionalFields=comments').then(function (commentExsit) {
-                    console.log(commentExsit.issues.length);
                     if (commentExsit.issues.length === 0) {
                         axios({
                             headers: {
@@ -501,8 +509,6 @@ export function ruleDataRestAPI(rulekey) {
         };
         ruledata.name = ruleResponseData.rule.name;
         ruledata.htmlDesc = ruleResponseData.rule.htmlDesc;
-        console.log("response rules Data : ", ruleResponseData);
-        console.log("send Rules Data : ", ruledata);
         return ruledata
     })
 }
@@ -547,7 +553,7 @@ export function SonarSourceViewAPI(fileKey) {
     let sonarScmData = [];
     let sonarData = [];
     return getJSON('/api/sources/show?from=1&key=' + fileKey).then(function(sonarSourceTotalLength){
-       if(sonarSourceTotalLength.total<2000){
+       if(sonarSourceTotalLength.sources.length<2000){
            return getJSON('/api/sources/scm?from=1&key=' + fileKey).then(function (sonarSourceSCM){
            for (let i = 0; i < sonarSourceSCM.scm.length; i++) {
                let sonarSourceSCMView = {
@@ -562,7 +568,8 @@ export function SonarSourceViewAPI(fileKey) {
                let sonarSourceView = {
                    number: '',
                    htmlDesc: '',
-                   committer: ''
+                   committer: '',
+                   source_more:false,
                };
                sonarSourceView.number = sonarSourceTotalLength.sources[i][0];
                sonarSourceView.htmlDesc = sonarSourceTotalLength.sources[i][1];
@@ -575,7 +582,6 @@ export function SonarSourceViewAPI(fileKey) {
                }
                sonarData[i] = sonarSourceView;
            }
-           console.log("response SonarSourceData : ", sonarData);
            return sonarData;
            });
        } else {
@@ -594,7 +600,8 @@ export function SonarSourceViewAPI(fileKey) {
                        let sonarSourceView = {
                            number: '',
                            htmlDesc: '',
-                           committer: ''
+                           committer: '',
+                           source_more:true,
                        };
                        sonarSourceView.number = sonarSource.sources[i][0];
                        sonarSourceView.htmlDesc = sonarSource.sources[i][1];
@@ -607,7 +614,6 @@ export function SonarSourceViewAPI(fileKey) {
                        }
                        sonarData[i] = sonarSourceView;
                    }
-                   console.log("response SonarSourceData : ", sonarData);
                    return sonarData;
                });
            });
@@ -620,37 +626,73 @@ export function SonarSourceDataMoreLoad(fileKey, from) {
     let regex = RegExp('\\w+@', 'i');
     let regexReplace = /@/i;
     let sonarScmData = [];
-    return getJSON('/api/sources/show?key=' + fileKey + "&from=" + from + "&to=" + from + 2000).then(function (sonarSource) {
-        return getJSON('/api/sources/scm?key=' + fileKey + "&from=" + from + "&to=" + from + 2000).then(function (sonarSourceSCM) {
-            for (let i = 0; i < sonarSourceSCM.scm.length; i++) {
-                let sonarSourceSCMView = {
-                    number: '',
-                    name: ''
-                };
-                sonarSourceSCMView.number = sonarSourceSCM.scm[i][0];
-                sonarSourceSCMView.name = regexReplace[Symbol.replace](regex.exec(sonarSourceSCM.scm[i][1]), '');
-                sonarScmData[i] = sonarSourceSCMView
-            }
-            for (let i = 0; i < sonarSource.sources.length; i++) {
-                let sonarSourceView = {
-                    number: '',
-                    htmlDesc: '',
-                    committer: ''
-                };
-                sonarSourceView.number = sonarSource.sources[i][0];
-                sonarSourceView.htmlDesc = sonarSource.sources[i][1];
-                for (let j = 0; j < sonarScmData.length; j++) {
-                    if (sonarSourceView.number <= sonarScmData[j].number) {
-                        if (sonarSourceView.number === sonarScmData[j].number) {
-                            sonarSourceView.committer = sonarScmData[j].name
-                        }
+    return getJSON('/api/sources/show?from=1&key=' + fileKey).then(function(sonarSourceTotalLength) {
+        if (sonarSourceTotalLength.sources[sonarSourceTotalLength.sources.length-1][0]===from-1) {
+            return getJSON('/api/sources/show?key=' + fileKey + "&from=" + from + "&to=" + from + 2000).then(function (sonarSource) {
+                return getJSON('/api/sources/scm?key=' + fileKey + "&from=" + from + "&to=" + from + 2000).then(function (sonarSourceSCM) {
+                    for (let i = 0; i < sonarSourceSCM.scm.length; i++) {
+                        let sonarSourceSCMView = {
+                            number: '',
+                            name: ''
+                        };
+                        sonarSourceSCMView.number = sonarSourceSCM.scm[i][0];
+                        sonarSourceSCMView.name = regexReplace[Symbol.replace](regex.exec(sonarSourceSCM.scm[i][1]), '');
+                        sonarScmData[i] = sonarSourceSCMView
                     }
-                }
-                sonarData[i] = sonarSourceView
-            }
-            console.log("response SonarSourceDataMoreLoad : ", sonarData);
-            return sonarData;
-        });
+                    for (let i = 0; i < sonarSource.sources.length; i++) {
+                        let sonarSourceView = {
+                            number: '',
+                            htmlDesc: '',
+                            committer: '',
+                            source_more:true,
+                        };
+                        sonarSourceView.number = sonarSource.sources[i][0];
+                        sonarSourceView.htmlDesc = sonarSource.sources[i][1];
+                        for (let j = 0; j < sonarScmData.length; j++) {
+                            if (sonarSourceView.number <= sonarScmData[j].number) {
+                                if (sonarSourceView.number === sonarScmData[j].number) {
+                                    sonarSourceView.committer = sonarScmData[j].name
+                                }
+                            }
+                        }
+                        sonarData[i] = sonarSourceView
+                    }
+                    return sonarData;
+                });
+            });
+        }else {
+            return getJSON('/api/sources/show?key=' + fileKey + "&from=" + from + "&to=" + from + 2000).then(function (sonarSource) {
+                return getJSON('/api/sources/scm?key=' + fileKey + "&from=" + from + "&to=" + from + 2000).then(function (sonarSourceSCM) {
+                    for (let i = 0; i < sonarSourceSCM.scm.length; i++) {
+                        let sonarSourceSCMView = {
+                            number: '',
+                            name: ''
+                        };
+                        sonarSourceSCMView.number = sonarSourceSCM.scm[i][0];
+                        sonarSourceSCMView.name = regexReplace[Symbol.replace](regex.exec(sonarSourceSCM.scm[i][1]), '');
+                        sonarScmData[i] = sonarSourceSCMView
+                    }
+                    for (let i = 0; i < sonarSource.sources.length; i++) {
+                        let sonarSourceView = {
+                            number: '',
+                            htmlDesc: '',
+                            committer: '',
+                            source_more:false,
+                        };
+                        sonarSourceView.number = sonarSource.sources[i][0];
+                        sonarSourceView.htmlDesc = sonarSource.sources[i][1];
+                        for (let j = 0; j < sonarScmData.length; j++) {
+                            if (sonarSourceView.number <= sonarScmData[j].number) {
+                                if (sonarSourceView.number === sonarScmData[j].number) {
+                                    sonarSourceView.committer = sonarScmData[j].name
+                                }
+                            }
+                        }
+                        sonarData[i] = sonarSourceView
+                    }
+                    return sonarData;
+                });
+            });
+        }
     });
-
 }

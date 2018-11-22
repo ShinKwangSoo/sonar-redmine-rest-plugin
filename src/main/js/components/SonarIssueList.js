@@ -127,7 +127,6 @@ export default class SonarIssueList extends React.PureComponent {
     }
 
     handleOpenModalToSetting() {
-        console.log(this.state.issue_list_tmp);
         this.setState({
             showModal2: true,
             requestState: "pending",

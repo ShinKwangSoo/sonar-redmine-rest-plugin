@@ -4,35 +4,49 @@ import "../common/SonarRedmine.css"
 export default class SonarIssueList extends React.PureComponent {
     constructor(props) {
         super(props);
-       /* this._tableRef=React.createRef();*/
-        this.state = {
-            SourceMoreButton: false,
-        };
+        /* this._tableRef=React.createRef();*/
         this.SonarSource = this.SonarSource.bind(this);
     }
-
-   /* scrollToLocation(){
-        this._tableRef.scrollIntoView({behavior:'smooth'})
-    }
-
-    componentDidMount() {
-        console.log("componentDidMount Scroll location");
-        if (this.props.sourceData.find((ruleNumber) => {ruleNumber.number=this.props.issue.line})) {
-            console.log("ComponentDidMount Rule Line in Source");
-            this.scrollToLocation();
+/*
+    componentDidMount(){
+        if (this.props.sourceData[this.props.sourceData.length - 1].number + 1 === this.props.sourceDataMore) {
+            this.setState({
+                SourceMoreButton: true
+            });
         }
     }
-
-    componentDidUpdate() {
-        console.log("componentDidupdate Scroll location");
-        if (this.props.sourceData.find((ruleNumber) => {ruleNumber.number=this.props.issue.line})) {
-            console.log("componentDidUpdate Rule Line in Source");
-            this.scrollToLocation();
+    componentDidUpdate(prevProps, prevState){
+        if(prevState.SourceMoreButton===true) {
+                if (this.props.sourceData[this.props.sourceData.length - 1].number + 1 === this.props.sourceDataMore) {
+                    this.setState({
+                        SourceMoreButton: false
+                    })
+                }
+            }
         }
     }*/
 
+    /* scrollToLocation(){
+         this._tableRef.scrollIntoView({behavior:'smooth'})
+     }
+
+     componentDidMount() {
+         console.log("componentDidMount Scroll location");
+         if (this.props.sourceData.find((ruleNumber) => {ruleNumber.number=this.props.issue.line})) {
+             console.log("ComponentDidMount Rule Line in Source");
+             this.scrollToLocation();
+         }
+     }
+
+     componentDidUpdate() {
+         console.log("componentDidupdate Scroll location");
+         if (this.props.sourceData.find((ruleNumber) => {ruleNumber.number=this.props.issue.line})) {
+             console.log("componentDidUpdate Rule Line in Source");
+             this.scrollToLocation();
+         }
+     }*/
+
     SonarSource() {
-        console.log("SonarSourceCall : ", this.props.sourceData);
         let table = [];
         for (let i = 0; i < this.props.sourceData.length; i++) {
             let _codeLine = 'nowrap sonarSourceViewCodeNumber';
@@ -49,11 +63,9 @@ export default class SonarIssueList extends React.PureComponent {
                 /*ref={_tableRef =>{this._tableRef=_tableRef}}*/
                 <tr id={this.props.sourceData[i].number}>
                     <td className={_codeLine}>
-                        {console.log("this.state.sourceData[i].number : ", this.props.sourceData[i].number)}
                         <div className="text-right">{this.props.sourceData[i].number}</div>
                     </td>
                     <td className={_codeSCM}>
-                        {console.log("this.state.sourceData[i].committer : ", this.props.sourceData[i].committer)}
                         <div className="text-center">{this.props.sourceData[i].committer}</div>
                     </td>
                     {codeLinkRule ? (
@@ -63,45 +75,40 @@ export default class SonarIssueList extends React.PureComponent {
                                 this.props.handleOpenModalMessage(this.props.issue.rule, event)
                             }}
                                  dangerouslySetInnerHTML={{__html: this.props.sourceData[i].htmlDesc || ''}}>
-                                {console.log("this.state.sourceData[i].htmlDesc : ", this.props.sourceData[i].htmlDesc)}
                             </div>
                         </td>
                     ) : (
                         <td className={_codeLocation}>
                             <div className="source-line-code-inner markdown"
                                  dangerouslySetInnerHTML={{__html: this.props.sourceData[i].htmlDesc || ''}}>
-                                {console.log("this.state.sourceData[i].htmlDesc : ", this.props.sourceData[i].htmlDesc)}</div>
+                            </div>
                         </td>
                     )}
                 </tr>
             );
         }
+
         return table
     }
 
-    LoadMoreButton() {
-        if (this.props.sourceData[this.props.sourceData.length - 1].number - 1 <= this.props.sourceDataMore) {
-            this.setState({
-                SourceMoreButton: true
-            });
-        }
+    LoadMoreData(){
         let button;
-        if (this.state.SourceMoreButton) {
+        if (this.props.sourceData[this.props.sourceData.length-1].source_more) {
             button = (<footer className="spacer-top note text-center">
-                <button onClick={() => this.props.LoadMoreCode}>Load</button>
+                <button onClick={(e) => this.props.LoadMoreCode(e)}>Load</button>
+                <button onClick={(e) => this.props.handleCloseModalComponent(e)}>Close</button>
             </footer>)
         } else {
-            button = <div/>
+            button = (<footer className="spacer-top note text-center">
+                <button onClick={(e) => this.props.handleCloseModalComponent(e)}>Close</button>
+            </footer>)
         }
-        return (
-            button
-        )
+        return button
     }
-
     render() {
+
         return (
             <div>
-                {console.log("SonarSourceViewModal Call")}
                 <table className="data zebra">
                     <thead>
                     <th className="nowrap text-left " colSpan={3}>
@@ -114,7 +121,7 @@ export default class SonarIssueList extends React.PureComponent {
                     </tbody>
                 </table>
                 <div>
-                    {this.LoadMoreButton()}
+                    {this.LoadMoreData()}
                 </div>
             </div>
         )
