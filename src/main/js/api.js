@@ -432,6 +432,7 @@ export function SelectedIssueToRedmine(sonar_project, issue, hosturl, user) {
     let issueline = issue.line;
     let issueseverity = issue.severity;
     let issuetype = issue.type;
+    let issueauthor=issue.author;
     let selectToIssueUser = user;
     let sonar_host_url = hosturl;
     getJSON('/api/settings/values?component=' + sonar_project.key + '&keys=sonar.redmine.hosturl,sonar.redmine.api-access-key,sonar.redmine.project-key,sonar.redmine.tracker-id')
@@ -465,7 +466,7 @@ export function SelectedIssueToRedmine(sonar_project, issue, hosturl, user) {
                                     data = {
                                         "issue": {
                                             "project_id": project,
-                                            "subject": issuerule + " : " + issuemessage,
+                                            "subject": "["+issueauthor+"]"+issuerule + " : " + issuemessage,
                                             "tracker_id": tracker,
                                             "assigned_to_id": selectToIssueUser,
                                             "description": issuerule + '\n' + issuemessage + '\n\n' + '\n\n Source Code location:\n' + issuecomponent + ' Line : ' + issueline + '\n\n' + 'check the sonarqube \n<' + sonar_host_url + '/project/issues?id=' + sonar_project.key.replace(':', '%3A') + '&open=' + issuekey + '&severities=' + issueseverity + '&types=' + issuetype + '>'
