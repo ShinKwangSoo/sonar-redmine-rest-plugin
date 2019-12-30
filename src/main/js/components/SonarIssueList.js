@@ -20,7 +20,7 @@ import {
     settingToRedmineProject,
     settingToRedmineTracker,
     settingToRedmineUser,
-    SonarHostURL
+    SonarHostURL, UserSyncRestAPI
 } from "../api";
 import '../common/SonarRedmine.css'
 import CheckListToRedmine from "./CheckListToRedmine";
@@ -65,6 +65,7 @@ export default class SonarIssueList extends React.PureComponent {
         this.showMoreCodeSmellList = this.showMoreCodeSmellList.bind(this);
         this.showMoreVulList = this.showMoreVulList.bind(this);
         this.ToRedmineFunction = this.ToRedmineFunction.bind(this);
+        this.RedmineUserCallOnSonarSetting=this.RedmineUserCallOnSonarSetting.bind(this)
     }
 
     componentDidMount() {
@@ -141,6 +142,11 @@ export default class SonarIssueList extends React.PureComponent {
     handleCloseModal2() {
         this.setState({showModal2: false});
     }
+
+    RedmineUserCallOnSonarSetting() {
+        UserSyncRestAPI(this.props.project);
+    }
+
 
     submitFunction() {
         this.setState({
@@ -287,6 +293,9 @@ export default class SonarIssueList extends React.PureComponent {
         return (
             <div className="code-components-cell">
                 <div>
+                    <button className="page-actions" onClick={this.RedmineUserCallOnSonarSetting}>User Sync</button>
+                </div>
+                <div>
                     <button className="page-actions" onClick={this.handleOpenModalToSetting}
                             disabled={this.state.loading}>Select ToRedmine
                     </button>
@@ -376,4 +385,6 @@ export default class SonarIssueList extends React.PureComponent {
             </div>
         )
     }
+
+
 }

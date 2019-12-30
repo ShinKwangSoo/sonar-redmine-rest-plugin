@@ -1,5 +1,5 @@
-sonar.apiVersion 5.6
+sonar.apiVersion 7.9
 
-Send SonaCube issue via REST API as RedMine.
+Send Sonarqube issue via REST API as redMine.
 
-This is TEST Projectee
+This is TEST Projecte
