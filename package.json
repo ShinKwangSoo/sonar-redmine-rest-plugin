@@ -57,7 +57,7 @@
     ]
   },
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.18.1",
     "rc-checkbox": "^2.1.5",
     "react-modal": "^3.4.5",
     "react-select": "^1.2.1",
