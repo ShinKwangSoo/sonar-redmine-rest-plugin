@@ -9,23 +9,23 @@ const labelStyle = {
 
 };
 
-export default class CheckListToRedmine extends React.Component {
+export default class IssueSenderSettingRedmineUser extends React.Component {
     constructor(props) {
         super(props);
-        this.RedmineUserList = this.RedmineUserList.bind(this);
+        this.IssueSenderSettingRedmineUser = this.IssueSenderSettingRedmineUser.bind(this);
     }
 
-    RedmineUserList() {
-        let redmineprojectName = [];
-        for (let i = 0, redmineprojectNumber = 0; i < this.props.container[2].length; i++) {
-            redmineprojectName[redmineprojectNumber] = {
+    IssueSenderSettingRedmineUser() {
+        let redmineProjectName = [];
+        for (let i = 0, redmineProjectNumber = 0; i < this.props.container[2].length; i++) {
+            redmineProjectName[redmineProjectNumber] = {
                 value: this.props.container[2][i].id,
                 label: this.props.container[2][i].firstname,
                 id: this.props.container[2][i].id
             };
-            redmineprojectNumber++;
+            redmineProjectNumber++;
         }
-        return redmineprojectName;
+        return redmineProjectName;
     }
 
     render() {

@@ -23,7 +23,7 @@ import {
     SonarHostURL, UserSyncRestAPI
 } from "../api";
 import '../common/SonarRedmine.css'
-import CheckListToRedmine from "./CheckListToRedmine";
+import IssueSenderSettingRedmineUser from "./IssueSenderSettingRedmineUser";
 
 export default class SonarIssueList extends React.PureComponent {
     constructor(props) {
@@ -314,7 +314,7 @@ export default class SonarIssueList extends React.PureComponent {
                             }
                         }}>
                         <div>
-                            <CheckListToRedmine container={this.state.settings}
+                            <IssueSenderSettingRedmineUser container={this.state.settings}
                                                 userDefault={this.state.selectUserValue}
                                                 userValue={this.updateUserValue}
                                                 issue_list_tmp={this.state.issue_list_tmp}

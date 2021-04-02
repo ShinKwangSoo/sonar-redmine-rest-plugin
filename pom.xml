@@ -6,14 +6,14 @@
     <groupId>org.sonar.plugins.redmine</groupId>
     <artifactId>sonar-redmine-plugin</artifactId>
     <packaging>sonar-plugin</packaging>
-    <version>0.3-snapshot</version>
+    <version>0.4-snapshot</version>
 
     <name>Sonarqube-to-redmine-plugin</name>
     <description>TEST</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <sonar.apiVersion>6.7.1</sonar.apiVersion>
+        <sonar.apiVersion>6.7.7</sonar.apiVersion>
         <jdk.min.version>1.8</jdk.min.version>
         <sonar.sources>src/main/java,src/main/js</sonar.sources>
     </properties>

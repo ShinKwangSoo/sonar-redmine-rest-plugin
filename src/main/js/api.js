@@ -135,6 +135,7 @@ export function findIssue_NextPage(project, count, types) {
         types: types,
         componentKey: project.key
     }).then(function (response) {
+        console.log("componentKey : ",project.key);
         var data = [];
         var numberOfIssue = 0;
         const numberOfIssueList = response.issues.length;
@@ -237,9 +238,10 @@ export function UserSyncRestAPI(project){
                 number++;
             }
             SonarSyncData[0] = userData;
+            console.log(SonarSyncData[0])
         });
-        post('/api/settings/reset', {component: project.key, key: 'sonar.redmine.user-list'}) &&
-        post('/api/settings/set', {component: project.key, key: 'sonar.redmine.user-list', value: SonarSyncData[0]});
+        post('/api/settings/reset', {keys: 'sonar.redmine.user-list'}) &&
+        post('/api/settings/set', {key: 'sonar.redmine.user-list', fieldValues: SonarSyncData[0]});
     });
 }
 

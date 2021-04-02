@@ -38,9 +38,9 @@ public class RedmineSettings {
     public static final String AUTO_SEVERITY = "sonar.redmine.auto_severity";
     public static final String AUTO_TYPE = "Auto Regist Rule Types";
     public static final String PROJECT_KEY = "sonar.redmine.project-key";
+    public static final String USER_LIST="sonar.redmine.user-list";
     public static final String USER_ID = "sonar.redmine.user-id";
     public static final String TRACKER_ID = "sonar.redmine.tracker-id";
-    public static final String USER_LIST="sonar.redmine.user-list";
     public static final String CATEGORY = "Sonar Redmine Plugin";
     public static final String BUG="sonar.redmine.ruleTypes.bugs";
     public static final String CODE_SMELL="sonar.redmine.ruleTypes.code_smell";
@@ -106,8 +106,7 @@ public class RedmineSettings {
                         .name("USER_LIST")
                         .description("USER_LIST")
                         .category(CATEGORY)
-                        .hidden()
-                        .onlyOnQualifiers(Qualifiers.PROJECT)
+                        .defaultValue(null)
                         .build()));
     }
 }

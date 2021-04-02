@@ -78,7 +78,6 @@ public class RedmineSettingsConfiguration {
     public String UserId() {
         return configuration.get(RedmineSettings.USER_ID).orElse(null);
     }
-
     public String baseUrl() {
         return baseUrl;
     }

@@ -36,6 +36,9 @@ public class SonarqubeIssueInScannerPostJob implements PostJob {
 
     @Override
     public void execute(PostJobContext context) {
+        if(context.analysisMode().isIssues()){
+
+        }
         if (redmineSettingsConfiguration.Auto_regist()) {
             for (PostJobIssue issue : context.issues()) {
                     connectRedmineIssue(issue);
