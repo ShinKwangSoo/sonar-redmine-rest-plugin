@@ -2,3 +2,4 @@
 .node/
 .target/
 .idea/
+/node_modules/
